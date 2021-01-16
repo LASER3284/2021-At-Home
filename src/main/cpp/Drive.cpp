@@ -40,8 +40,6 @@ CDrive::CDrive(frc::Joystick* pDriveController)
     m_pModFrontRight            = new CSwerveModule(m_pDriveMotorFrontRight, m_pAzimuthMotorFrontRight, m_pPotFrontRight, -29.0); // -20
     m_pModBackLeft              = new CSwerveModule(m_pDriveMotorBackLeft, m_pAzimuthMotorBackLeft, m_pPotBackLeft, 48.0); // 45
     m_pModBackRight             = new CSwerveModule(m_pDriveMotorBackRight, m_pAzimuthMotorBackRight, m_pPotBackRight, 49.0); // 50
-    // Create the NavX Gyro.
-    m_pGyro                     = new AHRS(frc::SPI::Port::kMXP);
 
     // Flip all the azimuth motors.
     m_pAzimuthMotorFrontLeft->SetInverted(true);
@@ -122,7 +120,7 @@ void CDrive::Init()
     m_pModBackRight->Init();
 
     // Zero the NavX.
-    m_pGyro->ZeroYaw();
+    m_Gyro.ZeroYaw();
 }
 
 /************************************************************************//**
@@ -158,7 +156,7 @@ void CDrive::Tick()
     }
 
     // Get Gyro angle from the NavX.
-    dTheta = (m_pGyro->GetAngle()) * (3.1415 / 180);
+    dTheta = (m_Gyro.GetAngle()) * (3.1415 / 180);
     
     // Calculate module wheel angles from the gyro.
     dTemp = dForward * std::cos(dTheta) + dSteering * std::sin(dTheta);

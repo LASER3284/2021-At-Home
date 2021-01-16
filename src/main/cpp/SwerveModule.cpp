@@ -24,7 +24,7 @@
  * 
  *	@implements     frc::SwerveModuleState
  ***************************************************************************/
-CSwerveModule::CSwerveModule(rev::CANSparkMax *pDriveMotor, rev::CANSparkMax *pAzimuthMotor, frc::AnalogPotentiometer *pPot, double dDegreeOffset) : frc::SwerveModuleState()
+CSwerveModule::CSwerveModule(rev::CANSparkMax *pDriveMotor, rev::CANSparkMax *pAzimuthMotor, frc::AnalogPotentiometer *pPot, double dDegreeOffset)
 {
     m_pDriveMotor = pDriveMotor;
     m_pAzimuthMotor = pAzimuthMotor;
@@ -121,8 +121,8 @@ void CSwerveModule::Tick()
 
     // Update the variables from SwerveModuleState every tick.
     // TODO: The velocity needs to be calculated properly, do this!
-    this->speed = (units::feet_per_second_t)m_pDriveMotor->GetEncoder().GetVelocity();
-    this->angle = *new frc::Rotation2d((units::radian_t)(GetAngle() * (3.1415 / 180)));
+    //this->speed = (units::feet_per_second_t)m_pDriveMotor->GetEncoder().GetVelocity();
+    //this->angle = *new frc::Rotation2d((units::radian_t)(GetAngle() * (3.1415 / 180)));
 }
 
 /************************************************************************//**  

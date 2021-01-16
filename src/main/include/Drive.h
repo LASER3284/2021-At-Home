@@ -8,9 +8,13 @@
 #pragma once
 
 #include "SwerveModule.h"
+#include "IOMap.h"
 #include <frc/Joystick.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
+#include <frc/kinematics/SwerveDriveOdometry.h>
 #include <AHRS.h>
+
+using namespace units;
 
 const double m_dJoystickDeadzone  = 0.12;
 /////////////////////////////////////////////////////////////////////////////
@@ -48,7 +52,13 @@ class CDrive
   CSwerveModule*                m_pModFrontRight;
   CSwerveModule*                m_pModBackLeft;
   CSwerveModule*                m_pModBackRight;
-  AHRS*                         m_pGyro;
-  //frc::SwerveDriveKinematics<4> m_pKinematics;
+  frc::HolonomicDriveController m_pHoloDrive;
+  AHRS                          m_Gyro      {frc::SPI::Port::kMXP};
+  frc::Translation2d            m_FrontLeft {(inch_t)-dWidth, (inch_t)dLength};
+  frc::Translation2d            m_FrontRight{(inch_t)dWidth, (inch_t)dLength};
+  frc::Translation2d            m_BackLeft  {(inch_t)-dWidth, (inch_t)-dLength};
+  frc::Translation2d            m_BackRight {(inch_t)dWidth, (inch_t)-dLength};
+  frc::SwerveDriveKinematics<4> m_Kinematics{m_FrontLeft, m_FrontRight, m_BackLeft, m_BackRight};
+  frc::SwerveDriveOdometry<4>   m_Odometry  {m_Kinematics, *new frc::Rotation2d((radian_t)m_Gyro.GetYaw())};
 };
 /////////////////////////////////////////////////////////////////////////////

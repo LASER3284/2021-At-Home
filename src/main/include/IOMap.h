@@ -6,6 +6,9 @@
     Project:		Swerve Drive
 ****************************************************************************/
 #pragma once
+
+#include <frc/geometry/Translation2d.h>
+using namespace units;
 /////////////////////////////////////////////////////////////////////////////
 
 // Robot Dimensions.

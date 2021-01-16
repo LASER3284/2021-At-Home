@@ -26,7 +26,7 @@
  *  @param          dDegreeOffset value of the offset of the azimuth
  *                  encoder relative to zero.
  ******************************************************************************/
-class CSwerveModule: public frc::SwerveModuleState
+class CSwerveModule
 {
  public:
   CSwerveModule(rev::CANSparkMax* pDriveMotor, rev::CANSparkMax* pAzimuthMotor, frc::AnalogPotentiometer* pPot, double dDegreeOffset);
