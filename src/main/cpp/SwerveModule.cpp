@@ -118,11 +118,6 @@ void CSwerveModule::Tick()
     default:
         break;
     }
-
-    // Update the variables from SwerveModuleState every tick.
-    // TODO: The velocity needs to be calculated properly, do this!
-    //this->speed = (units::feet_per_second_t)m_pDriveMotor->GetEncoder().GetVelocity();
-    //this->angle = *new frc::Rotation2d((units::radian_t)(GetAngle() * (3.1415 / 180)));
 }
 
 /************************************************************************//**  
@@ -253,5 +248,18 @@ void CSwerveModule::SetState(int nState)
 int CSwerveModule::GetState()
 {
     return m_nState;
+}
+
+/************************************************************************//**
+ *	@brief	        Returns the current state of the swerve module.
+ *
+ *	@param          None
+ *
+ *	@retval         SwerveModuleState current state of the swerve module
+ ***************************************************************************/
+frc::SwerveModuleState CSwerveModule::GetModuleState()
+{
+    return {(units::feet_per_second_t)m_pDriveMotor->GetEncoder().GetVelocity(),
+            frc::Rotation2d((units::radian_t)(GetAngle() * (3.1415 / 180)))};
 }
 /////////////////////////////////////////////////////////////////////////////

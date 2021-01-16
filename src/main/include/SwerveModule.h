@@ -42,6 +42,7 @@ class CSwerveModule
   void      SetState(int nState);
   int       GetState();
   void      Stop();
+  frc::SwerveModuleState  GetModuleState();
 
  private:
   // Object pointers.

@@ -40,6 +40,11 @@ CDrive::CDrive(frc::Joystick* pDriveController)
     m_pModFrontRight            = new CSwerveModule(m_pDriveMotorFrontRight, m_pAzimuthMotorFrontRight, m_pPotFrontRight, -29.0); // -20
     m_pModBackLeft              = new CSwerveModule(m_pDriveMotorBackLeft, m_pAzimuthMotorBackLeft, m_pPotBackLeft, 48.0); // 45
     m_pModBackRight             = new CSwerveModule(m_pDriveMotorBackRight, m_pAzimuthMotorBackRight, m_pPotBackRight, 49.0); // 50
+    // Create the drive controller and PID controllers.
+    m_pPIDx                     = new frc2::PIDController(0, 0, 0);
+    m_pPIDy                     = new frc2::PIDController(0, 0, 0);
+    //m_pPIDtheta                 = new frc::ProfiledPIDController(0, 0, 0,)
+    //m_pHoloDrive                = new frc::HolonomicDriveController()
 
     // Flip all the azimuth motors.
     m_pAzimuthMotorFrontLeft->SetInverted(true);
