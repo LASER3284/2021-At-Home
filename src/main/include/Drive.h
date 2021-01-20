@@ -54,9 +54,6 @@ class CDrive
   CSwerveModule*                          m_pModBackLeft;
   CSwerveModule*                          m_pModBackRight;
   frc::HolonomicDriveController*          m_pHoloDrive;
-  frc2::PIDController*                    m_pPIDx;
-  frc2::PIDController*                    m_pPIDy;
-  frc::ProfiledPIDController<radian>*   m_pPIDtheta;           
   AHRS                                    m_Gyro                     {frc::SPI::Port::kMXP};
   frc::Translation2d                      m_FrontLeft                {(inch_t)-dWidth, (inch_t)dLength};
   frc::Translation2d                      m_FrontRight               {(inch_t)dWidth, (inch_t)dLength};

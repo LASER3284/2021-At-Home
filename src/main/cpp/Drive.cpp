@@ -43,9 +43,14 @@ CDrive::CDrive(frc::Joystick* pDriveController)
     m_pModBackLeft              = new CSwerveModule(m_pDriveMotorBackLeft, m_pAzimuthMotorBackLeft, m_pPotBackLeft, 48.0); // 45
     m_pModBackRight             = new CSwerveModule(m_pDriveMotorBackRight, m_pAzimuthMotorBackRight, m_pPotBackRight, 49.0); // 50
     // Create the drive controller and PID controllers.
-    m_pPIDx                     = new frc2::PIDController(0, 0, 0);
-    m_pPIDy                     = new frc2::PIDController(0, 0, 0);
-    m_pPIDtheta                 = new frc::ProfiledPIDController<units::radian>(0.0, 0.0, 0.0, frc::TrapezoidProfile<radian>::Constraints{0.0_rad_per_s, 0.0_rad_per_s / 1_s}
+    m_pHoloDrive = new frc::HolonomicDriveController(
+        frc2::PIDController{0.0, 0.0, 0.0},
+        frc2::PIDController{0.0, 0.0, 0.0},
+        frc::ProfiledPIDController<radian>{0.0, 0.0, 0.0, frc::TrapezoidProfile<radian>::Constraints{0.0_rad_per_s, 0.0_rad_per_s / 1_s}
+    });
+    // m_pPIDx                     = new frc2::PIDController(0, 0, 0);
+    // m_pPIDy                     = new frc2::PIDController(0, 0, 0);
+    // m_pPIDtheta                 = new frc::ProfiledPIDController<radian>(0.0, 0.0, 0.0, frc::TrapezoidProfile<radian>::Constraints{0.0_rad_per_s, 0.0_rad_per_s / 1_s}
     // In theory, if we used SwerveControllerCommand, this shouldn't be necessary,
     // but the arguments don't work for some reason? No clue why.
     //m_pHoloDrive                = new frc::HolonomicDriveController(*m_pPIDx, *m_pPIDy, *m_pPIDtheta);
