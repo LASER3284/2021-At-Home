@@ -12,7 +12,7 @@
 #include <frc/Joystick.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/kinematics/SwerveDriveOdometry.h>
-#include <frc/controller/HolonomicDriveController.h>
+#include <frc2/command/SwerveControllerCommand.h>
 #include <AHRS.h>
 
 using namespace units;
@@ -56,13 +56,13 @@ class CDrive
   frc::HolonomicDriveController*          m_pHoloDrive;
   frc2::PIDController*                    m_pPIDx;
   frc2::PIDController*                    m_pPIDy;
-  frc::ProfiledPIDController<radian_t>*   m_pPIDtheta;           
-  AHRS                                    m_Gyro      {frc::SPI::Port::kMXP};
-  frc::Translation2d                      m_FrontLeft {(inch_t)-dWidth, (inch_t)dLength};
-  frc::Translation2d                      m_FrontRight{(inch_t)dWidth, (inch_t)dLength};
-  frc::Translation2d                      m_BackLeft  {(inch_t)-dWidth, (inch_t)-dLength};
-  frc::Translation2d                      m_BackRight {(inch_t)dWidth, (inch_t)-dLength};
-  frc::SwerveDriveKinematics<4>           m_Kinematics{m_FrontLeft, m_FrontRight, m_BackLeft, m_BackRight};
-  frc::SwerveDriveOdometry<4>             m_Odometry  {m_Kinematics, *new frc::Rotation2d((radian_t)m_Gyro.GetYaw())};
+  frc::ProfiledPIDController<radian>*   m_pPIDtheta;           
+  AHRS                                    m_Gyro                     {frc::SPI::Port::kMXP};
+  frc::Translation2d                      m_FrontLeft                {(inch_t)-dWidth, (inch_t)dLength};
+  frc::Translation2d                      m_FrontRight               {(inch_t)dWidth, (inch_t)dLength};
+  frc::Translation2d                      m_BackLeft                 {(inch_t)-dWidth, (inch_t)-dLength};
+  frc::Translation2d                      m_BackRight                {(inch_t)dWidth, (inch_t)-dLength};
+  frc::SwerveDriveKinematics<4>           m_Kinematics               {m_FrontLeft, m_FrontRight, m_BackLeft, m_BackRight};
+  frc::SwerveDriveOdometry<4>             m_Odometry                 {m_Kinematics, *new frc::Rotation2d(((radian)m_Gyro.GetYaw())};
 };
 /////////////////////////////////////////////////////////////////////////////

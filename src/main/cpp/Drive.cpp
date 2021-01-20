@@ -8,6 +8,8 @@
 #include "Drive.h"
 #include "IOMap.h"
 #include <frc/smartdashboard/SmartDashboard.h>
+
+using namespace units;
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -43,12 +45,14 @@ CDrive::CDrive(frc::Joystick* pDriveController)
     // Create the drive controller and PID controllers.
     m_pPIDx                     = new frc2::PIDController(0, 0, 0);
     m_pPIDy                     = new frc2::PIDController(0, 0, 0);
-    //m_pPIDtheta                 = new frc::ProfiledPIDController(0, 0, 0,)
-    //m_pHoloDrive                = new frc::HolonomicDriveController()
+    m_pPIDtheta                 = new frc::ProfiledPIDController<units::radian>(0.0, 0.0, 0.0, frc::TrapezoidProfile<radian>::Constraints{0.0_rad_per_s, 0.0_rad_per_s / 1_s}
+    // In theory, if we used SwerveControllerCommand, this shouldn't be necessary,
+    // but the arguments don't work for some reason? No clue why.
+    //m_pHoloDrive                = new frc::HolonomicDriveController(*m_pPIDx, *m_pPIDy, *m_pPIDtheta);
 
     // Flip all the azimuth motors.
     m_pAzimuthMotorFrontLeft->SetInverted(true);
-    m_pAzimuthMotorFrontRight->SetInverted(true);
+    m_pAzimuthMotorFrontRight->SetInverted(true);   
     m_pAzimuthMotorBackLeft->SetInverted(true);
     m_pAzimuthMotorBackRight->SetInverted(true);
 }
