@@ -8,6 +8,7 @@
 #pragma once
 
 #include "Drive.h"
+#include <frc/Timer.h>
 #include <frc/TimedRobot.h>
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -33,8 +34,21 @@ class CRobotMain : public frc::TimedRobot
   void TestPeriodic() override;
 
  private:
+  // State machines.
+  enum TeleopStates
+  {
+      eTeleopStopped,
+      eTeleopIdle,
+      eTeleopGeneratePath,
+      eTeleopFollowing
+  };
+
   // Object pointers.
-  frc::Joystick* m_pDriveController;
-  CDrive*        m_pRobotDrive;
+  frc::Timer*           m_pTimer;
+  frc::Joystick*        m_pDriveController;
+  CDrive*               m_pRobotDrive;
+
+  // Declare variables.
+  int                   m_nTeleopState;
 };
 /////////////////////////////////////////////////////////////////////////////

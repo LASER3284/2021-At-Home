@@ -13,6 +13,14 @@
 #include <frc/AnalogPotentiometer.h>
 #include <frc/controller/PIDController.h>
 #include <frc/kinematics/SwerveModuleState.h>
+#include <math.h>
+
+const double m_dDriveProportional = 0.015;
+const double m_dDriveIntegral     = 0.001;
+const double m_dDriveDerivative   = 0.007;
+const double m_dAngleProportional = 0.009;
+const double m_dAngleIntegral     = 0.000;
+const double m_dAngleDerivative   = 0.00003;
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -26,10 +34,10 @@
  *  @param          dDegreeOffset value of the offset of the azimuth
  *                  encoder relative to zero.
  ******************************************************************************/
-class CSwerveModule
+class CSwerveModule: public frc::SwerveModuleState
 {
  public:
-  CSwerveModule(rev::CANSparkMax* pDriveMotor, rev::CANSparkMax* pAzimuthMotor, frc::AnalogPotentiometer* pPot, double dDegreeOffset);
+  CSwerveModule(rev::CANSparkMax* pDriveMotor, rev::CANSparkMax* pAzimuthMotor, frc::AnalogInput* pPot, double dDegreeOffset);
   ~CSwerveModule();
   void      Init();
   void      Tick();
@@ -39,17 +47,19 @@ class CSwerveModule
   void      SetSpeed(double dSpeed);
   double    GetSpeed();
   double    GetSpeedSetpoint();
+  void      SetModuleReversed(bool bIsReversed);
   void      SetState(int nState);
   int       GetState();
   void      Stop();
-  frc::SwerveModuleState  GetModuleState();
+  frc::SwerveModuleState GetModuleState();
+  void      SetModuleState(frc::SwerveModuleState desiredState);
 
  private:
   // Object pointers.
-  frc2::PIDController*          m_pPIDController;
+  frc2::PIDController*          m_pAnglePIDController;
   rev::CANSparkMax*             m_pDriveMotor;
   rev::CANSparkMax*             m_pAzimuthMotor;
-  frc::AnalogPotentiometer*     m_pPot;
+  frc::AnalogInput*             m_pPot;
 
   // Member variables.
   int                           m_nState;

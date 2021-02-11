@@ -7,17 +7,44 @@
 ****************************************************************************/
 #pragma once
 
-#include "SwerveModule.h"
 #include "IOMap.h"
+#include "SwerveModule.h"
+#include "TrajectoryConstants.h"
 #include <frc/Joystick.h>
+#include <frc/geometry/Translation2d.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/kinematics/SwerveDriveOdometry.h>
+#include <frc/PIDController.h>
+#include <frc/controller/ProfiledPIDController.h>
 #include <frc2/command/SwerveControllerCommand.h>
+#include <frc/trajectory/TrajectoryGenerator.h>
 #include <AHRS.h>
 
+using namespace frc;
+using namespace frc2;
+using namespace rev;
 using namespace units;
 
-const double m_dJoystickDeadzone  = 0.12;
+const double m_dJoystickDeadzone  = 0.1;
+const double m_dTeleopMultiplier  = 3.60;
+// PID gains for the X translation.
+const double m_dPIDXkP            = 0.05;
+const double m_dPIDXkI            = 0.00;
+const double m_dPIDXkD            = 0.00;
+// PID gains for the Y translation
+const double m_dPIDYkP            = 0.05;
+const double m_dPIDYkI            = 0.00;
+const double m_dPIDYkD            = 0.00;
+// PID gains for the Theta rotation.
+const double m_dPIDThetakP        = 0.5;
+const double m_dPIDThetakI        = 0.00;
+const double m_dPIDThetakD        = 0.00;
+// Setup the swerve kinematics.
+const Translation2d FrontLeft                      = Translation2d((inch_t)(dWidth / 2), (inch_t)(dLength / 2));
+const Translation2d FrontRight                     = Translation2d((inch_t)(dWidth / 2), (inch_t)(-dLength / 2));
+const Translation2d BackLeft                       = Translation2d((inch_t)(-dWidth / 2), (inch_t)(dLength / 2));
+const Translation2d BackRight                      = Translation2d((inch_t)(-dWidth / 2), (inch_t)(-dLength / 2));
+const SwerveDriveKinematics<4> m_kKinematics       = SwerveDriveKinematics<4>(FrontLeft, FrontRight, BackLeft, BackRight);
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -31,35 +58,50 @@ class CDrive
  public:
   CDrive(frc::Joystick* pDriveController);
   ~CDrive();
-  void      Init();
-  void      Tick();
+  void            Init();
+  void            Tick();
+  void            Stop();
+  void            SetJoystickControl(bool bJoystickControl);
+  void            SetModuleStates(wpi::array<frc::SwerveModuleState, 4> desiredStates);
+  Pose2d          GetRobotPose();
+  void            ResetOdometry();
+  double          GetTrajectoryTotalTime();
+  void            SetSelectedTrajectory(int nAutoState);
+  void            GenerateTrajectoryFromCurrentPosition();
+  void            FollowTrajectory(double dElapsedTime);
+  double          GetYaw();
 
- private:
-  // Object pointers.
-  frc::Joystick*                          m_pDriveController;
-  rev::CANSparkMax*                       m_pDriveMotorFrontLeft;
-  rev::CANSparkMax*                       m_pAzimuthMotorFrontLeft;
-  rev::CANSparkMax*                       m_pDriveMotorFrontRight;
-  rev::CANSparkMax*                       m_pAzimuthMotorFrontRight;
-  rev::CANSparkMax*                       m_pDriveMotorBackLeft;
-  rev::CANSparkMax*                       m_pAzimuthMotorBackLeft;
-  rev::CANSparkMax*                       m_pDriveMotorBackRight;
-  rev::CANSparkMax*                       m_pAzimuthMotorBackRight;
-  frc::AnalogPotentiometer*               m_pPotFrontLeft;
-  frc::AnalogPotentiometer*               m_pPotFrontRight;
-  frc::AnalogPotentiometer*               m_pPotBackLeft;
-  frc::AnalogPotentiometer*               m_pPotBackRight;
-  CSwerveModule*                          m_pModFrontLeft;
-  CSwerveModule*                          m_pModFrontRight;
-  CSwerveModule*                          m_pModBackLeft;
-  CSwerveModule*                          m_pModBackRight;
-  frc::HolonomicDriveController*          m_pHoloDrive;
-  AHRS                                    m_Gyro                     {frc::SPI::Port::kMXP};
-  frc::Translation2d                      m_FrontLeft                {(inch_t)-dWidth, (inch_t)dLength};
-  frc::Translation2d                      m_FrontRight               {(inch_t)dWidth, (inch_t)dLength};
-  frc::Translation2d                      m_BackLeft                 {(inch_t)-dWidth, (inch_t)-dLength};
-  frc::Translation2d                      m_BackRight                {(inch_t)dWidth, (inch_t)-dLength};
-  frc::SwerveDriveKinematics<4>           m_Kinematics               {m_FrontLeft, m_FrontRight, m_BackLeft, m_BackRight};
-  frc::SwerveDriveOdometry<4>             m_Odometry                 {m_Kinematics, frc::Rotation2d{m_Gyro.GetRotation2d()}};
+ private:     
+  // Object pointers.     
+  Joystick*                          m_pDriveController;
+  frc::Timer*                        m_pTimer;
+  CANSparkMax*                       m_pDriveMotorFrontLeft;
+  CANSparkMax*                       m_pAzimuthMotorFrontLeft;
+  CANSparkMax*                       m_pDriveMotorFrontRight;
+  CANSparkMax*                       m_pAzimuthMotorFrontRight;
+  CANSparkMax*                       m_pDriveMotorBackLeft;
+  CANSparkMax*                       m_pAzimuthMotorBackLeft;
+  CANSparkMax*                       m_pDriveMotorBackRight;
+  CANSparkMax*                       m_pAzimuthMotorBackRight;
+  AnalogInput*                       m_pPotFrontLeft;
+  AnalogInput*                       m_pPotFrontRight;
+  AnalogInput*                       m_pPotBackLeft;
+  AnalogInput*                       m_pPotBackRight;
+  CSwerveModule*                     m_pModFrontLeft;
+  CSwerveModule*                     m_pModFrontRight;
+  CSwerveModule*                     m_pModBackLeft;
+  CSwerveModule*                     m_pModBackRight;
+  AHRS*                              m_pGyro;
+  SwerveDriveOdometry<4>*            m_pSwerveDriveOdometry;
+  HolonomicDriveController*          m_pHolonomicDriveController;
+  CTrajectoryConstants               TrajectoryConstants;
+  frc2::SwerveControllerCommand<4>*  m_SwerveControllerCommand;
+  
+
+  // Member Variables.
+  bool              m_bJoystickControl;
+  double            m_dYAxis;
+  double            m_dXAxis;
+  double            m_dRotateCW;
 };
 /////////////////////////////////////////////////////////////////////////////

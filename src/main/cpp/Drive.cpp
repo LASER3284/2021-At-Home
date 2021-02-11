@@ -6,10 +6,7 @@
 	Project:		Swerve Drive
 ****************************************************************************/
 #include "Drive.h"
-#include "IOMap.h"
 #include <frc/smartdashboard/SmartDashboard.h>
-
-using namespace units;
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -22,44 +19,40 @@ using namespace units;
  ****************************************************************************/
 CDrive::CDrive(frc::Joystick* pDriveController)
 {
+    // Initialize member variables.
+    m_bJoystickControl          = true;
+
     // Store the joystick pointer.
     m_pDriveController          = pDriveController;
     // Create objects to be passed into the modules.
-    m_pDriveMotorFrontLeft      = new rev::CANSparkMax(nDriveMotorLeftFront, rev::CANSparkMax::MotorType::kBrushless);
-    m_pDriveMotorFrontRight     = new rev::CANSparkMax(nDriveMotorRightFront, rev::CANSparkMax::MotorType::kBrushless);
-    m_pDriveMotorBackLeft       = new rev::CANSparkMax(nDriveMotorLeftBack, rev::CANSparkMax::MotorType::kBrushless);
-    m_pDriveMotorBackRight      = new rev::CANSparkMax(nDriveMotorRightBack, rev::CANSparkMax::MotorType::kBrushless);
-    m_pAzimuthMotorFrontLeft    = new rev::CANSparkMax(nAzimuthMotorLeftFront, rev::CANSparkMax::MotorType::kBrushless);
-    m_pAzimuthMotorFrontRight   = new rev::CANSparkMax(nAzimuthMotorRightFront, rev::CANSparkMax::MotorType::kBrushless);
-    m_pAzimuthMotorBackLeft     = new rev::CANSparkMax(nAzimuthMotorLeftBack, rev::CANSparkMax::MotorType::kBrushless);
-    m_pAzimuthMotorBackRight    = new rev::CANSparkMax(nAzimuthMotorRightBack, rev::CANSparkMax::MotorType::kBrushless);
-    m_pPotFrontLeft             = new frc::AnalogPotentiometer(nPotFrontLeft, 360);
-    m_pPotFrontRight            = new frc::AnalogPotentiometer(nPotFrontRight, 360);
-    m_pPotBackLeft              = new frc::AnalogPotentiometer(nPotBackLeft, 360);
-    m_pPotBackRight             = new frc::AnalogPotentiometer(nPotBackRight, 360);
+    m_pDriveMotorFrontLeft      = new CANSparkMax(nDriveMotorLeftFront, CANSparkMax::MotorType::kBrushless);
+    m_pDriveMotorFrontRight     = new CANSparkMax(nDriveMotorRightFront, CANSparkMax::MotorType::kBrushless);
+    m_pDriveMotorBackLeft       = new CANSparkMax(nDriveMotorLeftBack, CANSparkMax::MotorType::kBrushless);
+    m_pDriveMotorBackRight      = new CANSparkMax(nDriveMotorRightBack, CANSparkMax::MotorType::kBrushless);
+    m_pAzimuthMotorFrontLeft    = new CANSparkMax(nAzimuthMotorLeftFront, CANSparkMax::MotorType::kBrushless);
+    m_pAzimuthMotorFrontRight   = new CANSparkMax(nAzimuthMotorRightFront, CANSparkMax::MotorType::kBrushless);
+    m_pAzimuthMotorBackLeft     = new CANSparkMax(nAzimuthMotorLeftBack, CANSparkMax::MotorType::kBrushless);
+    m_pAzimuthMotorBackRight    = new CANSparkMax(nAzimuthMotorRightBack, CANSparkMax::MotorType::kBrushless);
+    m_pPotFrontLeft             = new AnalogInput(nPotFrontLeft);
+    m_pPotFrontRight            = new AnalogInput(nPotFrontRight);
+    m_pPotBackLeft              = new AnalogInput(nPotBackLeft);
+    m_pPotBackRight             = new AnalogInput(nPotBackRight);
     // Create our 4 swerve modules.
-    m_pModFrontLeft             = new CSwerveModule(m_pDriveMotorFrontLeft, m_pAzimuthMotorFrontLeft, m_pPotFrontLeft, 1.0); // 8
-    m_pModFrontRight            = new CSwerveModule(m_pDriveMotorFrontRight, m_pAzimuthMotorFrontRight, m_pPotFrontRight, -29.0); // -20
-    m_pModBackLeft              = new CSwerveModule(m_pDriveMotorBackLeft, m_pAzimuthMotorBackLeft, m_pPotBackLeft, 48.0); // 45
-    m_pModBackRight             = new CSwerveModule(m_pDriveMotorBackRight, m_pAzimuthMotorBackRight, m_pPotBackRight, 49.0); // 50
-    // Create the drive controller and PID controllers.
-    m_pHoloDrive = new frc::HolonomicDriveController(
-        frc2::PIDController{0.0, 0.0, 0.0},
-        frc2::PIDController{0.0, 0.0, 0.0},
-        frc::ProfiledPIDController<radian>{0.0, 0.0, 0.0, frc::TrapezoidProfile<radian>::Constraints{0.0_rad_per_s, 0.0_rad_per_s / 1_s}
-    });
-    // m_pPIDx                     = new frc2::PIDController(0, 0, 0);
-    // m_pPIDy                     = new frc2::PIDController(0, 0, 0);
-    // m_pPIDtheta                 = new frc::ProfiledPIDController<radian>(0.0, 0.0, 0.0, frc::TrapezoidProfile<radian>::Constraints{0.0_rad_per_s, 0.0_rad_per_s / 1_s}
-    // In theory, if we used SwerveControllerCommand, this shouldn't be necessary,
-    // but the arguments don't work for some reason? No clue why.
-    //m_pHoloDrive                = new frc::HolonomicDriveController(*m_pPIDx, *m_pPIDy, *m_pPIDtheta);
-
-    // Flip all the azimuth motors.
-    m_pAzimuthMotorFrontLeft->SetInverted(true);
-    m_pAzimuthMotorFrontRight->SetInverted(true);   
-    m_pAzimuthMotorBackLeft->SetInverted(true);
-    m_pAzimuthMotorBackRight->SetInverted(true);
+    m_pModFrontLeft             = new CSwerveModule(m_pDriveMotorFrontLeft, m_pAzimuthMotorFrontLeft, m_pPotFrontLeft, 175.0); // 1
+    m_pModFrontRight            = new CSwerveModule(m_pDriveMotorFrontRight, m_pAzimuthMotorFrontRight, m_pPotFrontRight, 30.0); // -29
+    m_pModBackLeft              = new CSwerveModule(m_pDriveMotorBackLeft, m_pAzimuthMotorBackLeft, m_pPotBackLeft, 125.0); // 48
+    m_pModBackRight             = new CSwerveModule(m_pDriveMotorBackRight, m_pAzimuthMotorBackRight, m_pPotBackRight, -55.0); // 49
+    // Create the NavX Gyro.
+    m_pGyro                     = new AHRS(I2C::Port::kMXP);
+    // Create Odometry. Start at -1 to prevent an error.
+    TrajectoryConstants.SelectTrajectory(-1);
+    m_pSwerveDriveOdometry      = new SwerveDriveOdometry<4>(m_kKinematics, Rotation2d(degree_t(GetYaw())), TrajectoryConstants.GetSelectedTrajectoryStartPoint());
+    // Setup motion profile controller with PID Controllers.
+    m_pHolonomicDriveController = new HolonomicDriveController( 
+        frc2::PIDController{m_dPIDXkP, m_dPIDXkI, m_dPIDXkD}, 
+        frc2::PIDController{m_dPIDYkP, m_dPIDYkI, m_dPIDYkD},
+        ProfiledPIDController<radian>{m_dPIDThetakP, m_dPIDThetakI, m_dPIDThetakD, TrapezoidProfile<radian>::Constraints{TrajectoryConstants.kMaxRotationSpeed, TrajectoryConstants.kMaxRotationAcceleration / 1_s}}
+    );
 }
 
 /************************************************************************//**
@@ -88,6 +81,9 @@ CDrive::~CDrive()
     delete m_pModFrontRight;
     delete m_pModBackLeft;
     delete m_pModBackRight;  
+    delete m_pGyro;
+    delete m_pSwerveDriveOdometry;
+    delete m_pHolonomicDriveController;
 
     m_pDriveController          = nullptr;
     m_pDriveMotorFrontLeft      = nullptr;
@@ -106,6 +102,9 @@ CDrive::~CDrive()
     m_pModFrontRight            = nullptr;
     m_pModBackLeft              = nullptr;
     m_pModBackRight             = nullptr;
+    m_pGyro                     = nullptr;
+    m_pSwerveDriveOdometry      = nullptr;
+    m_pHolonomicDriveController = nullptr;
 }
 
 /************************************************************************//**
@@ -133,8 +132,19 @@ void CDrive::Init()
     m_pModBackLeft->Init();
     m_pModBackRight->Init();
 
+    // Reverse Azimuth motor.
+    m_pAzimuthMotorFrontLeft->SetInverted(false);
+    m_pAzimuthMotorFrontRight->SetInverted(false);
+    m_pAzimuthMotorBackLeft->SetInverted(false);
+    m_pAzimuthMotorBackRight->SetInverted(false);
+
+    m_pDriveMotorFrontLeft->SetInverted(false);
+    m_pDriveMotorFrontRight->SetInverted(false);
+    m_pDriveMotorBackLeft->SetInverted(false);
+    m_pDriveMotorBackRight->SetInverted(false);
+
     // Zero the NavX.
-    m_Gyro.ZeroYaw();
+    m_pGyro->ZeroYaw();
 }
 
 /************************************************************************//**
@@ -146,104 +156,237 @@ void CDrive::Init()
  ****************************************************************************/
 void CDrive::Tick()
 {
-    // Set up some variables.
-    double dHypot = std::hypot(dWidth, dLength);
-    double dForward, dSteering, dRotateCW, dTheta, dTemp;
-
-    // Check 3 joysticks for deadzones. If they are below the deadzone threshold, set to 0.
-    dForward = -m_pDriveController->GetRawAxis(1);
-    if (fabs(dForward) < m_dJoystickDeadzone)
+    if (m_bJoystickControl)
     {
-        dForward = 0.0;
-    }
+        // Check joystick for deadzones. If it is below the deadzone threshold, set to 0.
+        m_dYAxis = m_pDriveController->GetRawAxis(1);
+        if (fabs(m_dYAxis) < m_dJoystickDeadzone)
+        {
+            m_dYAxis = 0.0;
+        }
+        else
+        {
+            // If the joystick is not in the deadzone, multiply it and square it.
+            m_dYAxis = copysign(pow(m_dYAxis * m_dTeleopMultiplier, 2), m_dYAxis);
+        }
+        
+        // Check joystick for deadzones. If it is below the deadzone threshold, set to 0.
+        m_dXAxis = m_pDriveController->GetRawAxis(0);
+        if (fabs(m_dXAxis) < m_dJoystickDeadzone)
+        {
+            m_dXAxis = 0.0;
+        }
+        else
+        {
+            // If the joystick is not in the deadzone, multiply it and square it.
+            m_dXAxis = copysign(pow(m_dXAxis * m_dTeleopMultiplier, 2), m_dXAxis);
+        }
+        
+        // Check joystick for deadzones. If it is below the deadzone threshold, set to 0.
+        m_dRotateCW = m_pDriveController->GetRawAxis(4);
+        if (fabs(m_dRotateCW) < m_dJoystickDeadzone)
+        {
+            m_dRotateCW = 0.0;
+        }
+        else
+        {
+            // If the joystick is not in the deadzone, multiply it and square it.
+            m_dRotateCW = copysign(pow(m_dRotateCW * m_dTeleopMultiplier, 2), m_dRotateCW);
+        }
 
-    dSteering = m_pDriveController->GetRawAxis(0);
-    if (fabs(dSteering) < m_dJoystickDeadzone)
-    {
-        dSteering = 0.0;
+        // Calculate and set module states.
+        // This is where we invert all joysticks.
+        auto States = m_kKinematics.ToSwerveModuleStates(frc::ChassisSpeeds::FromFieldRelativeSpeeds(meters_per_second_t(-m_dYAxis), meters_per_second_t(-m_dXAxis), radians_per_second_t(-m_dRotateCW), degree_t(GetYaw())));
+        // Normalize the wheelspeeds, making sure they don't go past 100% output.
+        m_kKinematics.NormalizeWheelSpeeds(&States, TrajectoryConstants.kMaxTranslationSpeed);
+        // Send the states to each module.
+        SetModuleStates(States);
     }
-
-    dRotateCW = m_pDriveController->GetRawAxis(4);
-    if (fabs(dRotateCW) < m_dJoystickDeadzone)
-    {
-        dRotateCW = 0.0;
-    }
-
-    // Get Gyro angle from the NavX.
-    dTheta = (m_Gyro.GetAngle()) * (3.1415 / 180);
     
-    // Calculate module wheel angles from the gyro.
-    dTemp = dForward * std::cos(dTheta) + dSteering * std::sin(dTheta);
-    dSteering = -dForward * std::sin(dTheta) + dSteering * std::cos(dTheta);
-    dForward = dTemp;
+    // Update drive odometry.
+    m_pSwerveDriveOdometry->Update(Rotation2d(degree_t(GetYaw())), m_pModFrontLeft->GetModuleState(), m_pModFrontRight->GetModuleState(), m_pModBackLeft->GetModuleState(), m_pModBackRight->GetModuleState());
 
-    // Do math. I honestly have no clue what these variable names are.
-    double A = dSteering - dRotateCW * (dLength/dHypot);
-    double B = dSteering + dRotateCW * (dLength/dHypot);
-    double C = dForward - dRotateCW * (dWidth/dHypot);
-    double D = dForward + dRotateCW * (dWidth/dHypot);
-
-    // Do wheelspeed math with the above math. Some trig stuff or whatever.
-    double dWheelSpeedFL = std::hypot(B, D);
-    double dWheelAngleFL = std::atan2(B, D) * 180 / 3.1415;
-
-    double dWheelSpeedFR = std::hypot(B, C);
-    double dWheelAngleFR = std::atan2(B, C) * 180 / 3.1415;
-
-    double dWheelSpeedBL = std::hypot(A, D);
-    double dWheelAngleBL = std::atan2(A, D) * 180 / 3.1415;
-
-    double dWheelSpeedBR = std::hypot(A, C);
-    double dWheelAngleBR = std::atan2(A, C) * 180 / 3.1415;
-
-    // Set wheelspeed and wheel angles.
-    m_pModFrontLeft->SetSpeed(-dWheelSpeedFL);
-    m_pModFrontLeft->SetAngle(dWheelAngleFL);
-    m_pModFrontRight->SetSpeed(dWheelSpeedFR);
-    m_pModFrontRight->SetAngle(dWheelAngleFR);
-    m_pModBackLeft->SetSpeed(-dWheelSpeedBL);
-    m_pModBackLeft->SetAngle(dWheelAngleBL);
-    m_pModBackRight->SetSpeed(dWheelSpeedBR);
-    m_pModBackRight->SetAngle(dWheelAngleBR);
-
-    // Make some arrays to send to SmartDashboard.
-    // @TODO These are SLOOOWWW
-    double dWheelAngles [4] =
-    {
-        m_pModFrontLeft->GetAngle(),
-        m_pModFrontRight->GetAngle(),
-        m_pModBackLeft->GetAngle(),
-        m_pModBackRight->GetAngle()
-    };
-
-    double dWheelAngleSetpoints [4] =
-    {
-        m_pModFrontLeft->GetAngleSetpoint(),
-        m_pModFrontRight->GetAngleSetpoint(),
-        m_pModBackLeft->GetAngleSetpoint(),
-        m_pModBackRight->GetAngleSetpoint()
-    };
-
-    // This is a double array because wpi::arrayref doesn't like int arrays (why?)
-    double dModStates [4] =
-    {
-        (double)m_pModFrontLeft->GetState(),
-        (double)m_pModFrontRight->GetState(),
-        (double)m_pModBackLeft->GetState(),
-        (double)m_pModBackRight->GetState()
-    };
-
-    // Send values to SmartDashboard.
-    frc::SmartDashboard::PutNumberArray("Wheel Angles", dWheelAngles);
-    frc::SmartDashboard::PutNumberArray("Mod States", dModStates);
-    frc::SmartDashboard::PutNumberArray("Wheel Angle Setpoints", dWheelAngleSetpoints);
-    frc::SmartDashboard::PutNumber("dSteering", dSteering);
-    frc::SmartDashboard::PutNumber("dForward", dForward);
+    // Put values on SmartDashboard.
+    SmartDashboard::PutNumber("Odometry X Pos", double(GetRobotPose().X()));
+    SmartDashboard::PutNumber("Odometry Y Pos", double(GetRobotPose().Y()));
+    SmartDashboard::PutNumber("Odometry Z Pos", double(GetRobotPose().Rotation().Degrees()));
 
     // Call swerve module ticks.
     m_pModFrontLeft->Tick();
     m_pModFrontRight->Tick();
     m_pModBackLeft->Tick();
     m_pModBackRight->Tick();
+}
+
+/************************************************************************//**
+ *  @brief	        Set the drive motors' speed to zero.
+ *
+ *	@param          None
+ *
+ *  @retval         Nothing
+ ****************************************************************************/
+void CDrive::Stop()
+{
+    m_pDriveMotorFrontLeft->Set(0.0);
+    m_pDriveMotorFrontRight->Set(0.0);
+    m_pDriveMotorBackLeft->Set(0.0);
+    m_pDriveMotorBackRight->Set(0.0);
+}
+
+/************************************************************************//**
+ *  @brief	        Enables or disables joystick control. 
+ *
+ *	@param          bool bJoystickControl 
+ *
+ *  @retval         Nothing
+ ****************************************************************************/
+void CDrive::SetJoystickControl(bool bJoystickControl)
+{
+    m_bJoystickControl = bJoystickControl;
+}
+
+/************************************************************************//**
+ *  @brief	        Sets the module states across all 4 swerve modules.
+ *
+ *	@param          SwerveModuleState[] States desired. 
+ *
+ *  @retval         Nothing
+ ****************************************************************************/
+void CDrive::SetModuleStates(wpi::array<frc::SwerveModuleState, 4> desiredStates)
+{
+    m_pModFrontLeft->SetModuleState(desiredStates[0]);
+    m_pModFrontRight->SetModuleState(desiredStates[1]);
+    m_pModBackLeft->SetModuleState(desiredStates[2]);
+    m_pModBackRight->SetModuleState(desiredStates[3]);
+}
+
+/************************************************************************//**
+ *  @brief	        Gets the current robot pose from odometry. 
+ *
+ *	@param          None
+ *
+ *  @retval         Pose2d The current robot pose.
+ ****************************************************************************/
+Pose2d CDrive::GetRobotPose()
+{
+    return m_pSwerveDriveOdometry->GetPose();
+}
+
+/************************************************************************//**
+ *  @brief	        Resets the robot position to the current selected trajectory 
+ *                  start point. 
+ *
+ *	@param          None
+ *
+ *  @retval         Nothing
+ ****************************************************************************/
+void CDrive::ResetOdometry()
+{
+    // Reset position.
+    m_pSwerveDriveOdometry->ResetPosition(TrajectoryConstants.GetSelectedTrajectoryStartPoint(), Rotation2d(degree_t(GetYaw())));
+}
+
+/************************************************************************//**
+ *  @brief	        Get the total trajectory time.
+ *
+ *	@param          None
+ *
+ *  @retval         double dTotalTime
+ ****************************************************************************/
+double CDrive::GetTrajectoryTotalTime()
+{
+    return TrajectoryConstants.GetSelectedTrajectoryTotalTime();
+}
+
+/************************************************************************//**
+ *  @brief	        Select a predetermined path from a list of auto states. 
+ *
+ *	@param          nAutoState The current auto path.
+ *
+ *  @retval         Nothing
+ ****************************************************************************/
+void CDrive::SetSelectedTrajectory(int nAutoState)
+{
+    TrajectoryConstants.SelectTrajectory(nAutoState);
+}
+
+/************************************************************************//**
+ *  @brief	        Build a list of waypoints from the current position of
+ *                  the robot and list of preset points.
+ *
+ *	@param          None
+ *
+ *  @retval         Trajectory The compiled trajectory.
+ ****************************************************************************/
+void CDrive::GenerateTrajectoryFromCurrentPosition()
+{
+    // Create the trajectory config.
+    auto Config = TrajectoryConfig(TrajectoryConstants.kMaxTranslationSpeed, TrajectoryConstants.kMaxTranslationAcceleration);
+    // Recreate swerve kinematics as an object.
+    SwerveDriveKinematics<4> Kinematics = SwerveDriveKinematics<4>(FrontLeft, FrontRight, BackLeft, BackRight);
+    // Add kinematics to ensure max speed for each module is actually obeyed.
+    Config.SetKinematics(Kinematics);
+
+    // Build the trajectory waypoints.
+    vector<Pose2d> vWaypoints;
+    // Place our current robot pose in a vector.
+    vWaypoints.emplace_back(GetRobotPose());
+    // Add preset path points.
+    for (Pose2d Point : TrajectoryConstants.PresetWaypoints)
+    {
+        vWaypoints.emplace_back(Point);
+    }
+
+    // Generate the trajectory and store it in CTrajectoryConstants.
+    try
+    {
+        // TrajectoryConstants.SelectTrajectory(TrajectoryGenerator::GenerateTrajectory(vWaypoints, Config));
+        TrajectoryConstants.SelectTrajectory(ePath);
+    }
+    catch(const std::exception& e)
+    {
+        // Print error to console.
+        std::cerr << e.what() << '\n';
+    }
+}
+
+/************************************************************************//**
+ *  @brief	        Follow the given path.
+ *
+ *	@param          Trajectory Path for robot to follow.
+ *
+ *  @retval         Nothing
+ ****************************************************************************/
+void CDrive::FollowTrajectory(double dElapsedTime)
+{
+    // Sample the trajectory at the given time.
+    auto Goal = TrajectoryConstants.GetSelectedTrajectory().Sample(second_t(dElapsedTime));
+    degree_t dDesiredTheta = degree_t(0); //Goal.pose.Rotation().Degrees();
+    SmartDashboard::PutNumber("Desired Theta", double(dDesiredTheta));
+
+    // Calculate the module states based on current position.
+    auto AdjustedSpeeds = m_pHolonomicDriveController->Calculate(GetRobotPose(), Goal, dDesiredTheta);
+
+    SmartDashboard::PutNumber("Wheel SPEEDX", double(AdjustedSpeeds.vx));
+    SmartDashboard::PutNumber("Wheel SPEEDY", double(AdjustedSpeeds.vy));
+
+    // Convert adjusted speeds to module states.
+    auto States = m_kKinematics.ToSwerveModuleStates(AdjustedSpeeds);
+
+    // Set modules states.
+    SetModuleStates(States);
+}
+
+/************************************************************************//**
+ *  @brief	        Return the rotational angle of the robot.
+ *
+ *	@param          None
+ *
+ *  @retval         double Angle in degrees
+ ****************************************************************************/
+double CDrive::GetYaw()
+{
+    // This inverts the Gyro, which is required by the module's implementation.
+    return -m_pGyro->GetYaw();
 }
 /////////////////////////////////////////////////////////////////////////////

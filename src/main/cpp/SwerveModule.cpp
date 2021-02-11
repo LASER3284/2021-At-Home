@@ -9,6 +9,7 @@
  ***************************************************************************/
 
 #include "SwerveModule.h"
+#include <frc/smartdashboard/SmartDashboard.h>
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -24,13 +25,13 @@
  * 
  *	@implements     frc::SwerveModuleState
  ***************************************************************************/
-CSwerveModule::CSwerveModule(rev::CANSparkMax *pDriveMotor, rev::CANSparkMax *pAzimuthMotor, frc::AnalogPotentiometer *pPot, double dDegreeOffset)
+CSwerveModule::CSwerveModule(rev::CANSparkMax *pDriveMotor, rev::CANSparkMax *pAzimuthMotor, frc::AnalogInput *pPot, double dDegreeOffset) : frc::SwerveModuleState()
 {
     m_pDriveMotor = pDriveMotor;
     m_pAzimuthMotor = pAzimuthMotor;
     m_pPot = pPot;
     m_dOffset = dDegreeOffset;
-    m_pPIDController = new frc2::PIDController(0.012, 0.0, 0.00003);
+    m_pAnglePIDController = new frc2::PIDController(m_dAngleProportional, m_dAngleIntegral, m_dAngleDerivative);
     m_dAngleSetpoint = 0.0;
 }
 
@@ -46,12 +47,12 @@ CSwerveModule::~CSwerveModule()
     delete m_pDriveMotor;
     delete m_pAzimuthMotor;
     delete m_pPot;
-    delete m_pPIDController;
+    delete m_pAnglePIDController;
 
     m_pDriveMotor = nullptr;
     m_pAzimuthMotor = nullptr;
     m_pPot = nullptr;
-    m_pPIDController = nullptr;
+    m_pAnglePIDController = nullptr;
 }
 
 /************************************************************************//**  
@@ -64,8 +65,12 @@ CSwerveModule::~CSwerveModule()
 void CSwerveModule::Init()
 {
     // Make sure PID input is expecting -180/180.
-    m_pPIDController->EnableContinuousInput(-180, 180);
-    m_pPIDController->SetTolerance(1);
+    m_pAnglePIDController->EnableContinuousInput(-180, 180);
+    m_pAnglePIDController->SetTolerance(1);
+    m_pDriveMotor->GetEncoder().SetVelocityConversionFactor(((1 / (8.31)) / 60) * (3.1415926  * (4 * 0.0254)));
+    m_pDriveMotor->GetPIDController().SetP(m_dDriveProportional);
+    m_pDriveMotor->GetPIDController().SetI(m_dDriveIntegral);
+    m_pDriveMotor->GetPIDController().SetD(m_dDriveDerivative);
 }
 
 /************************************************************************//**  
@@ -91,7 +96,7 @@ void CSwerveModule::Tick()
         // the PID reaches the target, then the state becomes idle.
         m_bReady = false;
         // Check to see if position is within tolerance.
-        if (m_pPIDController->AtSetpoint())
+        if (m_pAnglePIDController->AtSetpoint())
         {
             // Stop the motor and set the current state to eIdle.
             Stop();
@@ -99,7 +104,7 @@ void CSwerveModule::Tick()
         else
         {
             // Continue to the setpoint.
-            m_pAzimuthMotor->Set(m_pPIDController->Calculate(GetAngle()));
+            m_pAzimuthMotor->Set(m_pAnglePIDController->Calculate(GetAngle()));
         }
         break;
 
@@ -118,6 +123,10 @@ void CSwerveModule::Tick()
     default:
         break;
     }
+
+    // Update module state.
+    this->speed = (units::meters_per_second_t)(m_pDriveMotor->GetEncoder().GetVelocity());
+    this->angle = *new frc::Rotation2d(units::degree_t(GetAngle()));
 }
 
 /************************************************************************//**  
@@ -129,23 +138,13 @@ void CSwerveModule::Tick()
  ***************************************************************************/
 void CSwerveModule::SetAngle(double dAngle)
 {
-    // If the setpoint is 0, then skip ignore the setpoint to
-    // prevent jumping back to 0 when letting go of the stick.
-    if (dAngle == 0)
-    {
-        // Idle to make sure azimuth stops.
-        SetState(eIdle);
-    }
-    else
-    {
-        // Set the setpoint of the PID controller and the variable.
-        m_dAngleSetpoint = dAngle;
-        m_pPIDController->SetSetpoint(m_dAngleSetpoint);
-        // Run calculate once to make sure the PID controller knows it isn't at setpoint.
-        m_pPIDController->Calculate(GetAngle());
-        // Change state to eFinding to move to setpoint.
-        SetState(eFinding);
-    }
+    // Set the setpoint of the PID controller and the variable.
+    m_dAngleSetpoint = dAngle;
+    m_pAnglePIDController->SetSetpoint(m_dAngleSetpoint);
+    // Run calculate once to make sure the PID controller knows it isn't at setpoint.
+    m_pAnglePIDController->Calculate(GetAngle());
+    // Change state to eFinding to move to setpoint.
+    SetState(eFinding);
 }
 
 /************************************************************************//**  
@@ -157,8 +156,9 @@ void CSwerveModule::SetAngle(double dAngle)
  ***************************************************************************/
 double CSwerveModule::GetAngle()
 {
-    // Subtract 180 to get the encoder in a -180/180 range.
-    return (m_pPot->Get() + m_dOffset) - 180.0;
+    // Get the voltage, divide it by 5 to get a 0-1 value.
+    // Multiply it by 360 to get degrees, add the module's offset, and flip it by 180.
+    return (((-m_pPot->GetVoltage() / 5.0) * 360.0) + m_dOffset) - 180.0;
 }
 
 /************************************************************************//**  
@@ -211,6 +211,18 @@ double CSwerveModule::GetSpeedSetpoint()
     return m_dSpeedSetpoint;
 }
 
+/************************************************************************//**  
+ *	@brief	        Set the serve module drive motor reversed.
+ *
+ *	@param          bool bIsReversed
+ *
+ *	@retval         Nothing
+ ***************************************************************************/
+void CSwerveModule::SetModuleReversed(bool bIsReversed)
+{
+    m_pDriveMotor->SetInverted(bIsReversed);
+}
+
  /***********************************************************************//** 
  *	@brief	        Stops the azimuth motor and returns the state machine to
  *                  idle.
@@ -255,11 +267,30 @@ int CSwerveModule::GetState()
  *
  *	@param          None
  *
- *	@retval         SwerveModuleState current state of the swerve module
+ *	@retval         SwerveModuleState Current swerve module state.
  ***************************************************************************/
 frc::SwerveModuleState CSwerveModule::GetModuleState()
 {
-    return {(units::feet_per_second_t)m_pDriveMotor->GetEncoder().GetVelocity(),
-            frc::Rotation2d((units::radian_t)(GetAngle() * (3.1415 / 180)))};
+    return SwerveModuleState{this->speed, this->angle};
+}
+
+/************************************************************************//**
+ *	@brief	        Sets the SwerveModuleState state of the module.
+ *
+ *	@param          None
+ *
+ *	@retval         SwerveModuleState Current swerve module state.
+ ***************************************************************************/
+void CSwerveModule::SetModuleState(frc::SwerveModuleState desiredState)
+{
+    // Optimize the desired state, it should never rotate more than 90 degrees.
+    desiredState = this->Optimize(desiredState, units::degree_t(GetAngle()));
+    // Convert angle and speed to double setpoints.
+    double speedOutput = (desiredState.speed.to<double>());
+    double angleOutput = desiredState.angle.Degrees().to<double>();
+    // Set the speed of the drive.
+    m_pDriveMotor->GetPIDController().SetReference(speedOutput, rev::ControlType::kVelocity);
+    // Set the setpoint of the angle controller.
+    SetAngle(angleOutput);
 }
 /////////////////////////////////////////////////////////////////////////////
