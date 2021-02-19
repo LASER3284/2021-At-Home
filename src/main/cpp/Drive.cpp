@@ -25,18 +25,18 @@ CDrive::CDrive(frc::Joystick* pDriveController)
     // Store the joystick pointer.
     m_pDriveController          = pDriveController;
     // Create objects to be passed into the modules.
-    m_pDriveMotorFrontLeft      = new CANSparkMax(nDriveMotorLeftFront, CANSparkMax::MotorType::kBrushless);
-    m_pDriveMotorFrontRight     = new CANSparkMax(nDriveMotorRightFront, CANSparkMax::MotorType::kBrushless);
-    m_pDriveMotorBackLeft       = new CANSparkMax(nDriveMotorLeftBack, CANSparkMax::MotorType::kBrushless);
-    m_pDriveMotorBackRight      = new CANSparkMax(nDriveMotorRightBack, CANSparkMax::MotorType::kBrushless);
-    m_pAzimuthMotorFrontLeft    = new CANSparkMax(nAzimuthMotorLeftFront, CANSparkMax::MotorType::kBrushless);
-    m_pAzimuthMotorFrontRight   = new CANSparkMax(nAzimuthMotorRightFront, CANSparkMax::MotorType::kBrushless);
-    m_pAzimuthMotorBackLeft     = new CANSparkMax(nAzimuthMotorLeftBack, CANSparkMax::MotorType::kBrushless);
-    m_pAzimuthMotorBackRight    = new CANSparkMax(nAzimuthMotorRightBack, CANSparkMax::MotorType::kBrushless);
-    m_pPotFrontLeft             = new AnalogInput(nPotFrontLeft);
-    m_pPotFrontRight            = new AnalogInput(nPotFrontRight);
-    m_pPotBackLeft              = new AnalogInput(nPotBackLeft);
-    m_pPotBackRight             = new AnalogInput(nPotBackRight);
+    m_pDriveMotorFrontLeft      = new motorcontrol::can::TalonFX(nDriveMotorLeftFront);
+    m_pDriveMotorFrontRight     = new motorcontrol::can::TalonFX(nDriveMotorRightFront);
+    m_pDriveMotorBackLeft       = new motorcontrol::can::TalonFX(nDriveMotorLeftBack);
+    m_pDriveMotorBackRight      = new motorcontrol::can::TalonFX(nDriveMotorRightBack);
+    m_pAzimuthMotorFrontLeft    = new motorcontrol::can::TalonFX(nAzimuthMotorLeftFront);
+    m_pAzimuthMotorFrontRight   = new motorcontrol::can::TalonFX(nAzimuthMotorRightFront);
+    m_pAzimuthMotorBackLeft     = new motorcontrol::can::TalonFX(nAzimuthMotorLeftBack);
+    m_pAzimuthMotorBackRight    = new motorcontrol::can::TalonFX(nAzimuthMotorRightBack);
+    m_pPotFrontLeft             = new sensors::CANCoder(nPotFrontLeft);
+    m_pPotFrontRight            = new sensors::CANCoder(nPotFrontRight);
+    m_pPotBackLeft              = new sensors::CANCoder(nPotBackLeft);
+    m_pPotBackRight             = new sensors::CANCoder(nPotBackRight);
     // Create our 4 swerve modules.
     m_pModFrontLeft             = new CSwerveModule(m_pDriveMotorFrontLeft, m_pAzimuthMotorFrontLeft, m_pPotFrontLeft, 175.0); // 1
     m_pModFrontRight            = new CSwerveModule(m_pDriveMotorFrontRight, m_pAzimuthMotorFrontRight, m_pPotFrontRight, 30.0); // -29
@@ -117,14 +117,14 @@ CDrive::~CDrive()
 void CDrive::Init()
 {
     // Clear faults for motor controllers.
-    m_pDriveMotorFrontLeft->ClearFaults(); 
-    m_pDriveMotorFrontRight->ClearFaults();
-    m_pDriveMotorBackLeft->ClearFaults(); 
-    m_pDriveMotorBackRight->ClearFaults();   
-    m_pAzimuthMotorFrontLeft->ClearFaults(); 
-    m_pAzimuthMotorFrontRight->ClearFaults();
-    m_pAzimuthMotorBackLeft->ClearFaults();  
-    m_pAzimuthMotorBackRight->ClearFaults(); 
+    m_pDriveMotorFrontLeft->ClearStickyFaults(); 
+    m_pDriveMotorFrontRight->ClearStickyFaults();
+    m_pDriveMotorBackLeft->ClearStickyFaults(); 
+    m_pDriveMotorBackRight->ClearStickyFaults();   
+    m_pAzimuthMotorFrontLeft->ClearStickyFaults(); 
+    m_pAzimuthMotorFrontRight->ClearStickyFaults();
+    m_pAzimuthMotorBackLeft->ClearStickyFaults();  
+    m_pAzimuthMotorBackRight->ClearStickyFaults(); 
 
     // Initialize swerve modules.
     m_pModFrontLeft->Init();
@@ -227,10 +227,10 @@ void CDrive::Tick()
  ****************************************************************************/
 void CDrive::Stop()
 {
-    m_pDriveMotorFrontLeft->Set(0.0);
-    m_pDriveMotorFrontRight->Set(0.0);
-    m_pDriveMotorBackLeft->Set(0.0);
-    m_pDriveMotorBackRight->Set(0.0);
+    m_pDriveMotorFrontLeft->Set(motorcontrol::ControlMode::PercentOutput, 0.0);
+    m_pDriveMotorFrontRight->Set(motorcontrol::ControlMode::PercentOutput, 0.0);
+    m_pDriveMotorBackLeft->Set(motorcontrol::ControlMode::PercentOutput, 0.0);
+    m_pDriveMotorBackRight->Set(motorcontrol::ControlMode::PercentOutput, 0.0);
 }
 
 /************************************************************************//**

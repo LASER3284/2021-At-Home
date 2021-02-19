@@ -22,7 +22,7 @@
 
 using namespace frc;
 using namespace frc2;
-using namespace rev;
+using namespace ctre::phoenix;
 using namespace units;
 
 const double m_dJoystickDeadzone  = 0.1;
@@ -75,18 +75,18 @@ class CDrive
   // Object pointers.     
   Joystick*                          m_pDriveController;
   frc::Timer*                        m_pTimer;
-  CANSparkMax*                       m_pDriveMotorFrontLeft;
-  CANSparkMax*                       m_pAzimuthMotorFrontLeft;
-  CANSparkMax*                       m_pDriveMotorFrontRight;
-  CANSparkMax*                       m_pAzimuthMotorFrontRight;
-  CANSparkMax*                       m_pDriveMotorBackLeft;
-  CANSparkMax*                       m_pAzimuthMotorBackLeft;
-  CANSparkMax*                       m_pDriveMotorBackRight;
-  CANSparkMax*                       m_pAzimuthMotorBackRight;
-  AnalogInput*                       m_pPotFrontLeft;
-  AnalogInput*                       m_pPotFrontRight;
-  AnalogInput*                       m_pPotBackLeft;
-  AnalogInput*                       m_pPotBackRight;
+  motorcontrol::can::TalonFX*        m_pDriveMotorFrontLeft;
+  motorcontrol::can::TalonFX*        m_pAzimuthMotorFrontLeft;
+  motorcontrol::can::TalonFX*        m_pDriveMotorFrontRight;
+  motorcontrol::can::TalonFX*        m_pAzimuthMotorFrontRight;
+  motorcontrol::can::TalonFX*        m_pDriveMotorBackLeft;
+  motorcontrol::can::TalonFX*        m_pAzimuthMotorBackLeft;
+  motorcontrol::can::TalonFX*        m_pDriveMotorBackRight;
+  motorcontrol::can::TalonFX*        m_pAzimuthMotorBackRight;
+  sensors::CANCoder*                 m_pPotFrontLeft;
+  sensors::CANCoder*                 m_pPotFrontRight;
+  sensors::CANCoder*                 m_pPotBackLeft;
+  sensors::CANCoder*                 m_pPotBackRight;
   CSwerveModule*                     m_pModFrontLeft;
   CSwerveModule*                     m_pModFrontRight;
   CSwerveModule*                     m_pModBackLeft;
