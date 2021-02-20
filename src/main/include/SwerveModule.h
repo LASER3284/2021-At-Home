@@ -17,13 +17,15 @@
 
 using namespace ctre::phoenix;
 
-const double m_dEncoderConvert    = ((1 / (8.31)) / 60) * (3.1415926  * (4 * 0.0254));
-const double m_dDriveProportional = 0.015;
-const double m_dDriveIntegral     = 0.001;
-const double m_dDriveDerivative   = 0.007;
-const double m_dAngleProportional = 0.009;
-const double m_dAngleIntegral     = 0.000;
-const double m_dAngleDerivative   = 0.00003;
+const int m_dEncoderTicksPerRev     = 2048;
+const double m_dEncoderConvert      = ((1 / (8.16)) * 10) * (3.1415926  * (4 * 0.0254));
+const double m_dDriveProportional   = 0.003;
+const double m_dDriveIntegral       = 0.000;
+const double m_dDriveDerivative     = 0.000;
+const double m_dDriveFeedForward    = 0.049;
+const double m_dAngleProportional   = 0.007;
+const double m_dAngleIntegral       = 0.000;
+const double m_dAngleDerivative     = 0.000;
 /////////////////////////////////////////////////////////////////////////////
 
 

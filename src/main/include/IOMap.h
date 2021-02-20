@@ -13,8 +13,8 @@ const double dLength                    = 31.5;
 const double dWidth                     = 31.5;
 
 // CAN Device IDs.
-const int nDriveMotorLeftFront	  		=  	9;		//  Spark MAX ID for left front drive motor
-const int nAzimuthMotorLeftFront  		=  	10;		//  Spark MAX ID for left front azimuth motor 						
+const int nDriveMotorLeftFront	  		=  	10;		//  Spark MAX ID for left front drive motor
+const int nAzimuthMotorLeftFront  		=  	9;		//  Spark MAX ID for left front azimuth motor 						
 const int nDriveMotorRightFront			=   7;		//  Spark MAX ID for right front drive motor
 const int nAzimuthMotorRightFront  		=   8;		//  Spark MAX ID for right front azimuth motor						
 const int nDriveMotorLeftBack	  		=  	11;		//  Spark MAX ID for left back drive motor
@@ -23,10 +23,10 @@ const int nDriveMotorRightBack	  		=   14;		//  Spark MAX ID for right back driv
 const int nAzimuthMotorRightBack		=   13;		//  Spark MAX ID for right back azimuth motor						
 
 // Analog Channels.
-const int nPotFrontLeft                 =   0;      //  Potentiometer ID for front left encoder
-const int nPotFrontRight                =   1;      //  Potentiometer ID for front right encoder
-const int nPotBackLeft                  =   2;      //  Potentiometer ID for back left encoder
-const int nPotBackRight                 =   3;      //  Potentiometer ID for back right encoder
+const int nEncoderFrontLeft             =   14;      //  CANCoder ID for front left encoder
+const int nEncoderFrontRight            =   15;      //  CANCoder ID for front right encoder
+const int nEncoderBackLeft              =   16;      //  CANCoder ID for back left encoder
+const int nEncoderBackRight             =   17;      //  CANCoder ID for back right encoder
 
 // Xbox Controller Button Assignments.
 enum XboxButtons 		{eButtonA = 1, eButtonB, eButtonX, eButtonY, eButtonLB, eButtonRB, eBack, eStart, eButtonLS, eButtonRS};

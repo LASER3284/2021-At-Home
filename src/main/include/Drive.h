@@ -26,7 +26,7 @@ using namespace ctre::phoenix;
 using namespace units;
 
 const double m_dJoystickDeadzone  = 0.1;
-const double m_dTeleopMultiplier  = 3.60;
+const double m_dTeleopMultiplier  = 4.0;
 // PID gains for the X translation.
 const double m_dPIDXkP            = 0.05;
 const double m_dPIDXkI            = 0.00;
@@ -83,10 +83,10 @@ class CDrive
   motorcontrol::can::TalonFX*        m_pAzimuthMotorBackLeft;
   motorcontrol::can::TalonFX*        m_pDriveMotorBackRight;
   motorcontrol::can::TalonFX*        m_pAzimuthMotorBackRight;
-  sensors::CANCoder*                 m_pPotFrontLeft;
-  sensors::CANCoder*                 m_pPotFrontRight;
-  sensors::CANCoder*                 m_pPotBackLeft;
-  sensors::CANCoder*                 m_pPotBackRight;
+  sensors::CANCoder*                 m_pEncoderFrontLeft;
+  sensors::CANCoder*                 m_pEncoderFrontRight;
+  sensors::CANCoder*                 m_pEncoderBackLeft;
+  sensors::CANCoder*                 m_pEncoderBackRight;
   CSwerveModule*                     m_pModFrontLeft;
   CSwerveModule*                     m_pModFrontRight;
   CSwerveModule*                     m_pModBackLeft;

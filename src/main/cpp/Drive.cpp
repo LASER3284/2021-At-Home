@@ -33,17 +33,17 @@ CDrive::CDrive(frc::Joystick* pDriveController)
     m_pAzimuthMotorFrontRight   = new motorcontrol::can::TalonFX(nAzimuthMotorRightFront);
     m_pAzimuthMotorBackLeft     = new motorcontrol::can::TalonFX(nAzimuthMotorLeftBack);
     m_pAzimuthMotorBackRight    = new motorcontrol::can::TalonFX(nAzimuthMotorRightBack);
-    m_pPotFrontLeft             = new sensors::CANCoder(nPotFrontLeft);
-    m_pPotFrontRight            = new sensors::CANCoder(nPotFrontRight);
-    m_pPotBackLeft              = new sensors::CANCoder(nPotBackLeft);
-    m_pPotBackRight             = new sensors::CANCoder(nPotBackRight);
+    m_pEncoderFrontLeft         = new sensors::CANCoder(nEncoderFrontLeft);
+    m_pEncoderFrontRight        = new sensors::CANCoder(nEncoderFrontRight);
+    m_pEncoderBackLeft          = new sensors::CANCoder(nEncoderBackLeft);
+    m_pEncoderBackRight         = new sensors::CANCoder(nEncoderBackRight);
     // Create our 4 swerve modules.
-    m_pModFrontLeft             = new CSwerveModule(m_pDriveMotorFrontLeft, m_pAzimuthMotorFrontLeft, m_pPotFrontLeft, 175.0); // 1
-    m_pModFrontRight            = new CSwerveModule(m_pDriveMotorFrontRight, m_pAzimuthMotorFrontRight, m_pPotFrontRight, 30.0); // -29
-    m_pModBackLeft              = new CSwerveModule(m_pDriveMotorBackLeft, m_pAzimuthMotorBackLeft, m_pPotBackLeft, 125.0); // 48
-    m_pModBackRight             = new CSwerveModule(m_pDriveMotorBackRight, m_pAzimuthMotorBackRight, m_pPotBackRight, -55.0); // 49
+    m_pModFrontLeft             = new CSwerveModule(m_pDriveMotorFrontLeft, m_pAzimuthMotorFrontLeft, m_pEncoderFrontLeft, 0); // 1
+    m_pModFrontRight            = new CSwerveModule(m_pDriveMotorFrontRight, m_pAzimuthMotorFrontRight, m_pEncoderFrontRight, 0); // -29
+    m_pModBackLeft              = new CSwerveModule(m_pDriveMotorBackLeft, m_pAzimuthMotorBackLeft, m_pEncoderBackLeft, 0); // 48
+    m_pModBackRight             = new CSwerveModule(m_pDriveMotorBackRight, m_pAzimuthMotorBackRight, m_pEncoderBackRight, 0); // 49
     // Create the NavX Gyro.
-    m_pGyro                     = new AHRS(I2C::Port::kMXP);
+    m_pGyro                     = new AHRS(SerialPort::Port::kUSB);
     // Create Odometry. Start at -1 to prevent an error.
     TrajectoryConstants.SelectTrajectory(-1);
     m_pSwerveDriveOdometry      = new SwerveDriveOdometry<4>(m_kKinematics, Rotation2d(degree_t(GetYaw())), TrajectoryConstants.GetSelectedTrajectoryStartPoint());
@@ -73,10 +73,10 @@ CDrive::~CDrive()
     delete m_pAzimuthMotorFrontRight;   
     delete m_pAzimuthMotorBackLeft;     
     delete m_pAzimuthMotorBackRight;    
-    delete m_pPotFrontLeft;             
-    delete m_pPotFrontRight;            
-    delete m_pPotBackLeft;              
-    delete m_pPotBackRight;
+    delete m_pEncoderFrontLeft;             
+    delete m_pEncoderFrontRight;            
+    delete m_pEncoderBackLeft;              
+    delete m_pEncoderBackRight;
     delete m_pModFrontLeft;
     delete m_pModFrontRight;
     delete m_pModBackLeft;
@@ -94,10 +94,10 @@ CDrive::~CDrive()
     m_pAzimuthMotorFrontRight   = nullptr;
     m_pAzimuthMotorBackLeft     = nullptr;
     m_pAzimuthMotorBackRight    = nullptr;
-    m_pPotFrontLeft             = nullptr;
-    m_pPotFrontRight            = nullptr;
-    m_pPotBackLeft              = nullptr;
-    m_pPotBackRight             = nullptr;
+    m_pEncoderFrontLeft             = nullptr;
+    m_pEncoderFrontRight            = nullptr;
+    m_pEncoderBackLeft              = nullptr;
+    m_pEncoderBackRight             = nullptr;
     m_pModFrontLeft             = nullptr;
     m_pModFrontRight            = nullptr;
     m_pModBackLeft              = nullptr;
@@ -210,6 +210,12 @@ void CDrive::Tick()
     SmartDashboard::PutNumber("Odometry X Pos", double(GetRobotPose().X()));
     SmartDashboard::PutNumber("Odometry Y Pos", double(GetRobotPose().Y()));
     SmartDashboard::PutNumber("Odometry Z Pos", double(GetRobotPose().Rotation().Degrees()));
+
+    SmartDashboard::PutNumber("FrontLeft Speed", m_pModFrontLeft->GetSpeed());
+    SmartDashboard::PutNumber("FrontRight Speed", m_pModFrontRight->GetSpeed());
+    SmartDashboard::PutNumber("BackLeft Speed", m_pModBackLeft->GetSpeed());
+    SmartDashboard::PutNumber("BackRight Speed", m_pModBackRight->GetSpeed());
+
 
     // Call swerve module ticks.
     m_pModFrontLeft->Tick();

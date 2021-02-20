@@ -68,10 +68,13 @@ void CSwerveModule::Init()
     // Make sure PID input is expecting -180/180.
     m_pAnglePIDController->EnableContinuousInput(-180, 180);
     m_pAnglePIDController->SetTolerance(1);
+    m_pDriveMotor->ConfigSelectedFeedbackSensor(motorcontrol::FeedbackDevice::IntegratedSensor);
+    m_pDriveMotor->Config_kF(0, m_dDriveFeedForward);
     m_pDriveMotor->Config_kP(0, m_dDriveProportional);
     m_pDriveMotor->Config_kI(0, m_dDriveIntegral);
     m_pDriveMotor->Config_kD(0, m_dDriveDerivative);
     m_pEncoder->SetPositionToAbsolute();
+    m_pEncoder->ConfigAbsoluteSensorRange(ctre::phoenix::sensors::AbsoluteSensorRange::Signed_PlusMinus180);
 }
 
 /************************************************************************//**  
@@ -126,7 +129,7 @@ void CSwerveModule::Tick()
     }
 
     // Update module state.
-    this->speed = (units::meters_per_second_t)(m_dEncoderConvert * m_pDriveMotor->GetSelectedSensorVelocity());
+    this->speed = (units::meters_per_second_t)GetSpeed();
     this->angle = *new frc::Rotation2d(units::degree_t(GetAngle()));
 }
 
@@ -159,7 +162,8 @@ double CSwerveModule::GetAngle()
 {
     // Get the encoder value, divide it by the sensor resolution to get a 0-1 value.
     // Multiply it by 360 to get degrees, add the module's offset, and flip it by 180.
-    return (((-m_pEncoder->GetAbsolutePosition() / 2048.0) * 360.0) + m_dOffset) - 180.0;
+    return (m_pEncoder->GetAbsolutePosition() + m_dOffset);
+    std::cout << "RAW: " << m_pEncoder->GetPosition() << std::endl;
 }
 
 /************************************************************************//**  
@@ -185,7 +189,6 @@ void CSwerveModule::SetSpeed(double dSpeed)
 {
     // Store variable.
     m_dSpeedSetpoint = dSpeed;
-    m_pDriveMotor->Set(motorcontrol::ControlMode::PercentOutput, m_dSpeedSetpoint);
 }
 
 /************************************************************************//**  
@@ -197,7 +200,7 @@ void CSwerveModule::SetSpeed(double dSpeed)
  ***************************************************************************/
 double CSwerveModule::GetSpeed()
 {
-    return m_pDriveMotor->GetMotorOutputPercent();
+    return (m_pDriveMotor->GetSelectedSensorVelocity() / m_dEncoderTicksPerRev) * m_dEncoderConvert;
 }
 
 /************************************************************************//**  
@@ -290,8 +293,9 @@ void CSwerveModule::SetModuleState(frc::SwerveModuleState desiredState)
     double speedOutput = (desiredState.speed.to<double>());
     double angleOutput = desiredState.angle.Degrees().to<double>();
     // Set the speed of the drive.
-    m_pDriveMotor->Set(motorcontrol::ControlMode::Velocity, speedOutput);
+    m_pDriveMotor->Set(motorcontrol::ControlMode::Velocity, speedOutput / m_dEncoderConvert * m_dEncoderTicksPerRev);
     // Set the setpoint of the angle controller.
     SetAngle(angleOutput);
+    SetSpeed(speedOutput);
 }
 /////////////////////////////////////////////////////////////////////////////
