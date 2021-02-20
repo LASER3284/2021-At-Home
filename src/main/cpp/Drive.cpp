@@ -346,8 +346,7 @@ void CDrive::GenerateTrajectoryFromCurrentPosition()
     // Generate the trajectory and store it in CTrajectoryConstants.
     try
     {
-        // TrajectoryConstants.SelectTrajectory(TrajectoryGenerator::GenerateTrajectory(vWaypoints, Config));
-        TrajectoryConstants.SelectTrajectory(ePath);
+        TrajectoryConstants.SelectTrajectory(TrajectoryGenerator::GenerateTrajectory(vWaypoints, Config));
     }
     catch(const std::exception& e)
     {

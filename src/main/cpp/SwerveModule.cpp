@@ -290,10 +290,10 @@ void CSwerveModule::SetModuleState(frc::SwerveModuleState desiredState)
     // Optimize the desired state, it should never rotate more than 90 degrees.
     desiredState = this->Optimize(desiredState, units::degree_t(GetAngle()));
     // Convert angle and speed to double setpoints.
-    double speedOutput = (desiredState.speed.to<double>());
+    double speedOutput = (desiredState.speed.to<double>() / m_dEncoderConvert * m_dEncoderTicksPerRev);
     double angleOutput = desiredState.angle.Degrees().to<double>();
     // Set the speed of the drive.
-    m_pDriveMotor->Set(motorcontrol::ControlMode::Velocity, speedOutput / m_dEncoderConvert * m_dEncoderTicksPerRev);
+    m_pDriveMotor->Set(motorcontrol::ControlMode::Velocity, speedOutput);
     // Set the setpoint of the angle controller.
     SetAngle(angleOutput);
     SetSpeed(speedOutput);

@@ -22,7 +22,10 @@ using namespace wpi;
 enum TrajectoryList 
 { 
     eTestPath1 = 1,
-    ePath
+    eBarrelPath,
+    eSlalomPath,
+    eBouncePath,
+    eBasicPath
 };
 /////////////////////////////////////////////////////////////////////////////
 
@@ -39,14 +42,29 @@ public:
                 m_SelectedTrajectory = TrajectoryUtil::FromPathweaverJson("/home/lvuser/deploy/paths/output/Path1.wpilib.json");
                 break;
 
-            case ePath :
+            case eBarrelPath :
                 // Read and store the trajectory from a pre-generated JSON file.
-                m_SelectedTrajectory = TrajectoryUtil::FromPathweaverJson("/home/lvuser/deploy/paths/output/Path2.wpilib.json");
+                m_SelectedTrajectory = TrajectoryUtil::FromPathweaverJson("/home/lvuser/deploy/paths/output/BarrelPath1.wpilib.json");
+                break;
+
+            case eSlalomPath :
+                // Read and store the trajectory from a pre-generated JSON file.
+                m_SelectedTrajectory = TrajectoryUtil::FromPathweaverJson("/home/lvuser/deploy/paths/output/SlalomPath1.wpilib.json");
+                break;
+
+            case eBouncePath :
+                // Read and store the trajectory from a pre-generated JSON file.
+                m_SelectedTrajectory = TrajectoryUtil::FromPathweaverJson("/home/lvuser/deploy/paths/output/BouncePath1.wpilib.json");
+                break;
+
+            case eBasicPath :
+                // Read and store the trajectory from a pre-generated JSON file.
+                m_SelectedTrajectory = TrajectoryUtil::FromPathweaverJson("/home/lvuser/deploy/paths/output/BasicPath1.wpilib.json");
                 break;
 
             default :
                 // Read and store the trajectory from a pre-generated JSON file.
-                m_SelectedTrajectory = TrajectoryUtil::FromPathweaverJson("/home/lvuser/deploy/paths/output/Path1.wpilib.json");
+                m_SelectedTrajectory = TrajectoryUtil::FromPathweaverJson("/home/lvuser/deploy/paths/output/BasicPath1.wpilib.json");
                 break;
         }
     }
