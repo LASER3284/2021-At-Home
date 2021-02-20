@@ -69,6 +69,7 @@ void CRobotMain::RobotInit()
 	m_pAutonomousChooser->AddOption("Bounce Path", "Bounce Path");
 	m_pAutonomousChooser->AddOption("Basic Path", "Basic Path");
     m_pAutonomousChooser->AddOption("Test Path", "Test Path");
+	m_pAutonomousChooser->AddOption("Just Sing a Song", "Just Sing a Song");
 	SmartDashboard::PutData(m_pAutonomousChooser);
 
 	// Start the robot timer.
@@ -231,6 +232,9 @@ void CRobotMain::AutonomousPeriodic()
 			// Sing a song...
 			break;
 	}
+
+	// Call drive tick.
+	m_pRobotDrive->Tick();
 }
 
 /************************************************************************//**

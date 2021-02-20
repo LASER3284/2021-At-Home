@@ -23,9 +23,9 @@ const double m_dDriveProportional   = 0.003;
 const double m_dDriveIntegral       = 0.000;
 const double m_dDriveDerivative     = 0.000;
 const double m_dDriveFeedForward    = 0.049;
-const double m_dAngleProportional   = 0.007;
-const double m_dAngleIntegral       = 0.000;
-const double m_dAngleDerivative     = 0.000;
+const double m_dAngleProportional   = 0.008;
+const double m_dAngleIntegral       = 0.0035;
+const double m_dAngleDerivative     = 0.001;
 /////////////////////////////////////////////////////////////////////////////
 
 

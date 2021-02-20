@@ -38,10 +38,10 @@ CDrive::CDrive(frc::Joystick* pDriveController)
     m_pEncoderBackLeft          = new sensors::CANCoder(nEncoderBackLeft);
     m_pEncoderBackRight         = new sensors::CANCoder(nEncoderBackRight);
     // Create our 4 swerve modules.
-    m_pModFrontLeft             = new CSwerveModule(m_pDriveMotorFrontLeft, m_pAzimuthMotorFrontLeft, m_pEncoderFrontLeft, 0); // 1
-    m_pModFrontRight            = new CSwerveModule(m_pDriveMotorFrontRight, m_pAzimuthMotorFrontRight, m_pEncoderFrontRight, 0); // -29
-    m_pModBackLeft              = new CSwerveModule(m_pDriveMotorBackLeft, m_pAzimuthMotorBackLeft, m_pEncoderBackLeft, 0); // 48
-    m_pModBackRight             = new CSwerveModule(m_pDriveMotorBackRight, m_pAzimuthMotorBackRight, m_pEncoderBackRight, 0); // 49
+    m_pModFrontLeft             = new CSwerveModule(m_pDriveMotorFrontLeft, m_pAzimuthMotorFrontLeft, m_pEncoderFrontLeft, 155); // 1
+    m_pModFrontRight            = new CSwerveModule(m_pDriveMotorFrontRight, m_pAzimuthMotorFrontRight, m_pEncoderFrontRight, -131); // -29
+    m_pModBackLeft              = new CSwerveModule(m_pDriveMotorBackLeft, m_pAzimuthMotorBackLeft, m_pEncoderBackLeft, 91); // 48
+    m_pModBackRight             = new CSwerveModule(m_pDriveMotorBackRight, m_pAzimuthMotorBackRight, m_pEncoderBackRight, -31); // 49
     // Create the NavX Gyro.
     m_pGyro                     = new AHRS(SerialPort::Port::kUSB);
     // Create Odometry. Start at -1 to prevent an error.
@@ -215,6 +215,10 @@ void CDrive::Tick()
     SmartDashboard::PutNumber("FrontRight Speed", m_pModFrontRight->GetSpeed());
     SmartDashboard::PutNumber("BackLeft Speed", m_pModBackLeft->GetSpeed());
     SmartDashboard::PutNumber("BackRight Speed", m_pModBackRight->GetSpeed());
+    SmartDashboard::PutNumber("FrontLeft Angle", m_pModFrontLeft->GetAngle());
+    SmartDashboard::PutNumber("FrontRight Angle", m_pModFrontRight->GetAngle());
+    SmartDashboard::PutNumber("BackLeft Angle", m_pModBackLeft->GetAngle());
+    SmartDashboard::PutNumber("BackRight Angle", m_pModBackRight->GetAngle());
 
 
     // Call swerve module ticks.
