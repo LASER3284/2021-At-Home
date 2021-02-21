@@ -67,7 +67,7 @@ void CSwerveModule::Init()
 {
     // Make sure PID input is expecting -180/180.
     m_pAnglePIDController->EnableContinuousInput(-180, 180);
-    m_pAnglePIDController->SetTolerance(1);
+    m_pAnglePIDController->SetTolerance(0);
     m_pDriveMotor->ConfigSelectedFeedbackSensor(motorcontrol::FeedbackDevice::IntegratedSensor);
     m_pDriveMotor->Config_kF(0, m_dDriveFeedForward);
     m_pDriveMotor->Config_kP(0, m_dDriveProportional);
@@ -107,8 +107,19 @@ void CSwerveModule::Tick()
         }
         else
         {
+            // Limit the PID output to a max value.
+            double dOutput = m_pAnglePIDController->Calculate(GetAngle());
+            if (dOutput > m_dAnglePIDMaxOutput)
+            {
+                dOutput = m_dAnglePIDMaxOutput;
+            }
+            if (dOutput < -m_dAnglePIDMaxOutput)
+            {
+                dOutput = -m_dAnglePIDMaxOutput;
+            }
+
             // Continue to the setpoint.
-            m_pAzimuthMotor->Set(motorcontrol::ControlMode::PercentOutput, m_pAnglePIDController->Calculate(GetAngle()));
+            m_pAzimuthMotor->Set(motorcontrol::ControlMode::PercentOutput, dOutput);
         }
         break;
 

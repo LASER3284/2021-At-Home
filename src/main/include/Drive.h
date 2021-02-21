@@ -26,7 +26,7 @@ using namespace ctre::phoenix;
 using namespace units;
 
 const double m_dJoystickDeadzone  = 0.12;
-const double m_dTeleopMultiplier  = 4.0;
+const double m_dTeleopMultiplier  = 3.0;
 // PID gains for the X translation.
 const double m_dPIDXkP            = 0.05;
 const double m_dPIDXkI            = 0.00;
