@@ -25,8 +25,8 @@ const int nAzimuthMotorRightBack		=   13;		//  Spark MAX ID for right back azimu
 // Analog Channels.
 const int nEncoderFrontLeft             =   14;      //  CANCoder ID for front left encoder
 const int nEncoderFrontRight            =   15;      //  CANCoder ID for front right encoder
-const int nEncoderBackLeft              =   16;      //  CANCoder ID for back left encoder
-const int nEncoderBackRight             =   17;      //  CANCoder ID for back right encoder
+const int nEncoderBackLeft              =   2;      //  CANCoder ID for back left encoder
+const int nEncoderBackRight             =   3;      //  CANCoder ID for back right encoder
 
 // Xbox Controller Button Assignments.
 enum XboxButtons 		{eButtonA = 1, eButtonB, eButtonX, eButtonY, eButtonLB, eButtonRB, eBack, eStart, eButtonLS, eButtonRS};

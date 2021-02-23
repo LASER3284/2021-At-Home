@@ -66,15 +66,18 @@ CSwerveModule::~CSwerveModule()
 void CSwerveModule::Init()
 {
     // Make sure PID input is expecting -180/180.
-    m_pAnglePIDController->EnableContinuousInput(-180, 180);
-    m_pAnglePIDController->SetTolerance(0);
     m_pDriveMotor->ConfigSelectedFeedbackSensor(motorcontrol::FeedbackDevice::IntegratedSensor);
     m_pDriveMotor->Config_kF(0, m_dDriveFeedForward);
     m_pDriveMotor->Config_kP(0, m_dDriveProportional);
     m_pDriveMotor->Config_kI(0, m_dDriveIntegral);
     m_pDriveMotor->Config_kD(0, m_dDriveDerivative);
+
+    m_pAnglePIDController->EnableContinuousInput(-180, 180);
+    m_pAnglePIDController->SetTolerance(1);
+    m_pAzimuthMotor->SetNeutralMode(motorcontrol::NeutralMode::Brake);
     m_pEncoder->SetPositionToAbsolute();
     m_pEncoder->ConfigAbsoluteSensorRange(ctre::phoenix::sensors::AbsoluteSensorRange::Signed_PlusMinus180);
+    m_pEncoder->ConfigSensorInitializationStrategy(sensors::SensorInitializationStrategy::BootToAbsolutePosition);
 }
 
 /************************************************************************//**  
@@ -107,19 +110,8 @@ void CSwerveModule::Tick()
         }
         else
         {
-            // Limit the PID output to a max value.
-            double dOutput = m_pAnglePIDController->Calculate(GetAngle());
-            if (dOutput > m_dAnglePIDMaxOutput)
-            {
-                dOutput = m_dAnglePIDMaxOutput;
-            }
-            if (dOutput < -m_dAnglePIDMaxOutput)
-            {
-                dOutput = -m_dAnglePIDMaxOutput;
-            }
-
             // Continue to the setpoint.
-            m_pAzimuthMotor->Set(motorcontrol::ControlMode::PercentOutput, dOutput);
+            m_pAzimuthMotor->Set(motorcontrol::ControlMode::PercentOutput, m_pAnglePIDController->Calculate(GetAngle()));
         }
         break;
 
@@ -173,8 +165,7 @@ double CSwerveModule::GetAngle()
 {
     // Get the encoder value, divide it by the sensor resolution to get a 0-1 value.
     // Multiply it by 360 to get degrees, add the module's offset, and flip it by 180.
-    return (m_pEncoder->GetAbsolutePosition() + m_dOffset);
-    std::cout << "RAW: " << m_pEncoder->GetPosition() << std::endl;
+    return (m_pEncoder->GetPosition() + m_dOffset);
 }
 
 /************************************************************************//**  
@@ -200,6 +191,8 @@ void CSwerveModule::SetSpeed(double dSpeed)
 {
     // Store variable.
     m_dSpeedSetpoint = dSpeed;
+    // Set the speed of the drive.
+    m_pDriveMotor->Set(motorcontrol::ControlMode::Velocity, m_dSpeedSetpoint);
 }
 
 /************************************************************************//**  
@@ -303,8 +296,6 @@ void CSwerveModule::SetModuleState(frc::SwerveModuleState desiredState)
     // Convert angle and speed to double setpoints.
     double speedOutput = (desiredState.speed.to<double>() / m_dEncoderConvert * m_dEncoderTicksPerRev);
     double angleOutput = desiredState.angle.Degrees().to<double>();
-    // Set the speed of the drive.
-    m_pDriveMotor->Set(motorcontrol::ControlMode::Velocity, speedOutput);
     // Set the setpoint of the angle controller.
     SetAngle(angleOutput);
     SetSpeed(speedOutput);
