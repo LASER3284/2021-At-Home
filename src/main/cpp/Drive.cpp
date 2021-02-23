@@ -215,6 +215,10 @@ void CDrive::Tick()
     SmartDashboard::PutNumber("FrontRight Speed", m_pModFrontRight->GetSpeed());
     SmartDashboard::PutNumber("BackLeft Speed", m_pModBackLeft->GetSpeed());
     SmartDashboard::PutNumber("BackRight Speed", m_pModBackRight->GetSpeed());
+    SmartDashboard::PutNumber("FrontLeft SpeedSP", double(m_pModFrontLeft->GetModuleState().speed));
+    SmartDashboard::PutNumber("FrontRight SpeedSP", double(m_pModFrontRight->GetModuleState().speed));
+    SmartDashboard::PutNumber("BackLeft SpeedSP", double(m_pModBackLeft->GetModuleState().speed));
+    SmartDashboard::PutNumber("BackRight SpeedSP", double(m_pModBackRight->GetModuleState().speed));
     SmartDashboard::PutNumber("FrontLeft Angle", m_pModFrontLeft->GetAngle());
     SmartDashboard::PutNumber("FrontRight Angle", m_pModFrontRight->GetAngle());
     SmartDashboard::PutNumber("BackLeft Angle", m_pModBackLeft->GetAngle());

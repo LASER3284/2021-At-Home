@@ -23,10 +23,11 @@ const double m_dDriveProportional   = 0.003;
 const double m_dDriveIntegral       = 0.000;
 const double m_dDriveDerivative     = 0.000;
 const double m_dDriveFeedForward    = 0.049;
-const double m_dAngleProportional   = 0.008;
-const double m_dAngleIntegral       = 0.000;
-const double m_dAngleDerivative     = 0.001; // This still does nothing. 
+const double m_dAngleProportional   = 0.0072;
+const double m_dAngleIntegral       = 0.0045;
+const double m_dAngleDerivative     = 0.000; // This still does nothing. 
 const double m_dAngleTolerance      = 1.000;
+const double m_dMotorDeadband       = 0.000;
 /////////////////////////////////////////////////////////////////////////////
 
 
