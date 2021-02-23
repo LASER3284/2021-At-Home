@@ -75,7 +75,7 @@ void CSwerveModule::Init()
     m_pAnglePIDController->EnableContinuousInput(-180, 180);
     m_pAnglePIDController->SetTolerance(1);
     m_pAzimuthMotor->SetNeutralMode(motorcontrol::NeutralMode::Brake);
-    m_pAzimuthMotor->ConfigNeutralDeadband(0.03);
+    m_pAzimuthMotor->ConfigNeutralDeadband(m_dMotorDeadband);
     m_pEncoder->SetPositionToAbsolute();
     m_pEncoder->ConfigAbsoluteSensorRange(ctre::phoenix::sensors::AbsoluteSensorRange::Signed_PlusMinus180);
     m_pEncoder->ConfigSensorInitializationStrategy(sensors::SensorInitializationStrategy::BootToAbsolutePosition);

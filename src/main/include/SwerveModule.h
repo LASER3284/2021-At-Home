@@ -27,6 +27,7 @@ const double m_dAngleProportional   = 0.0064;
 const double m_dAngleIntegral       = 0.0000;
 const double m_dAngleDerivative     = 0.0100; // This might do something. 
 const double m_dAngleTolerance      = 1.0000;
+const double m_dMotorDeadband       = 0.0300;
 /////////////////////////////////////////////////////////////////////////////
 
 
