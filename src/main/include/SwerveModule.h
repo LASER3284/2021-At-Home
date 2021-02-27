@@ -9,18 +9,25 @@
  ****************************************************************************/
 #pragma once
 
-#include <rev/CANSparkMax.h>
-#include <frc/AnalogPotentiometer.h>
+#include <ctre/phoenix/motorcontrol/can/WPI_TalonFX.h>
+#include <ctre/phoenix/sensors/CANCoder.h>
 #include <frc/controller/PIDController.h>
 #include <frc/kinematics/SwerveModuleState.h>
 #include <math.h>
 
-const double m_dDriveProportional = 0.015;
-const double m_dDriveIntegral     = 0.001;
-const double m_dDriveDerivative   = 0.007;
-const double m_dAngleProportional = 0.009;
-const double m_dAngleIntegral     = 0.000;
-const double m_dAngleDerivative   = 0.00003;
+using namespace ctre::phoenix;
+
+const int    m_dEncoderTicksPerRev  = 2048;
+const double m_dEncoderConvert      = ((1 / (8.16)) * 10) * (3.1415926  * (4 * 0.0254));
+const double m_dDriveProportional   = 0.0013;
+const double m_dDriveIntegral       = 0.0000;
+const double m_dDriveDerivative     = 0.0001;
+const double m_dDriveFeedForward    = 0.0466;
+const double m_dAngleProportional   = 0.0064;
+const double m_dAngleIntegral       = 0.0000;
+const double m_dAngleDerivative     = 0.0100; // This might do something. 
+const double m_dAngleTolerance      = 1.0000;
+const double m_dMotorDeadband       = 0.0300;
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -37,7 +44,7 @@ const double m_dAngleDerivative   = 0.00003;
 class CSwerveModule: public frc::SwerveModuleState
 {
  public:
-  CSwerveModule(rev::CANSparkMax* pDriveMotor, rev::CANSparkMax* pAzimuthMotor, frc::AnalogInput* pPot, double dDegreeOffset);
+  CSwerveModule(motorcontrol::can::TalonFX* pDriveMotor, motorcontrol::can::TalonFX* pAzimuthMotor, sensors::CANCoder* pEncoder, double dDegreeOffset);
   ~CSwerveModule();
   void      Init();
   void      Tick();
@@ -57,9 +64,9 @@ class CSwerveModule: public frc::SwerveModuleState
  private:
   // Object pointers.
   frc2::PIDController*          m_pAnglePIDController;
-  rev::CANSparkMax*             m_pDriveMotor;
-  rev::CANSparkMax*             m_pAzimuthMotor;
-  frc::AnalogInput*             m_pPot;
+  motorcontrol::can::TalonFX*   m_pDriveMotor;
+  motorcontrol::can::TalonFX*   m_pAzimuthMotor;
+  sensors::CANCoder*            m_pEncoder;
 
   // Member variables.
   int                           m_nState;

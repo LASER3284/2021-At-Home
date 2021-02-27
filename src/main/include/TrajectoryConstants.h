@@ -22,7 +22,10 @@ using namespace wpi;
 enum TrajectoryList 
 { 
     eTestPath1 = 1,
-    ePath
+    eBarrelPath,
+    eSlalomPath,
+    eBouncePath,
+    eBasicPath
 };
 /////////////////////////////////////////////////////////////////////////////
 
@@ -39,14 +42,29 @@ public:
                 m_SelectedTrajectory = TrajectoryUtil::FromPathweaverJson("/home/lvuser/deploy/paths/output/Path1.wpilib.json");
                 break;
 
-            case ePath :
+            case eBarrelPath :
                 // Read and store the trajectory from a pre-generated JSON file.
-                m_SelectedTrajectory = TrajectoryUtil::FromPathweaverJson("/home/lvuser/deploy/paths/output/Path2.wpilib.json");
+                m_SelectedTrajectory = TrajectoryUtil::FromPathweaverJson("/home/lvuser/deploy/paths/output/BarrelPath1.wpilib.json");
+                break;
+
+            case eSlalomPath :
+                // Read and store the trajectory from a pre-generated JSON file.
+                m_SelectedTrajectory = TrajectoryUtil::FromPathweaverJson("/home/lvuser/deploy/paths/output/SlalomPath1.wpilib.json");
+                break;
+
+            case eBouncePath :
+                // Read and store the trajectory from a pre-generated JSON file.
+                m_SelectedTrajectory = TrajectoryUtil::FromPathweaverJson("/home/lvuser/deploy/paths/output/BouncePath1.wpilib.json");
+                break;
+
+            case eBasicPath :
+                // Read and store the trajectory from a pre-generated JSON file.
+                m_SelectedTrajectory = TrajectoryUtil::FromPathweaverJson("/home/lvuser/deploy/paths/output/BasicPath1.wpilib.json");
                 break;
 
             default :
                 // Read and store the trajectory from a pre-generated JSON file.
-                m_SelectedTrajectory = TrajectoryUtil::FromPathweaverJson("/home/lvuser/deploy/paths/output/Path1.wpilib.json");
+                m_SelectedTrajectory = TrajectoryUtil::FromPathweaverJson("/home/lvuser/deploy/paths/output/BasicPath1.wpilib.json");
                 break;
         }
     }
@@ -62,7 +80,7 @@ public:
     double GetSelectedTrajectoryTotalTime()     {   return double(m_SelectedTrajectory.TotalTime());        };
 
     // Configure trajectory properties.
-    const meters_per_second_t kMaxTranslationSpeed = 3.6_mps;
+    const meters_per_second_t kMaxTranslationSpeed = 4.0_mps;
     const meters_per_second_squared_t kMaxTranslationAcceleration = 7.2_mps_sq;
     const radians_per_second_t kMaxRotationSpeed = 6.28_rad_per_s;
     const radians_per_second_t kMaxRotationAcceleration = 3.14_rad_per_s;

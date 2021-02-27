@@ -7,9 +7,10 @@
  *
  * 	Copyright © 2021 FIRST Team 3284 - Camdenton LASER Robotics.
  ***************************************************************************/
-
 #include "SwerveModule.h"
 #include <frc/smartdashboard/SmartDashboard.h>
+
+using namespace ctre::phoenix;
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -25,11 +26,11 @@
  * 
  *	@implements     frc::SwerveModuleState
  ***************************************************************************/
-CSwerveModule::CSwerveModule(rev::CANSparkMax *pDriveMotor, rev::CANSparkMax *pAzimuthMotor, frc::AnalogInput *pPot, double dDegreeOffset) : frc::SwerveModuleState()
+CSwerveModule::CSwerveModule(motorcontrol::can::TalonFX* pDriveMotor, motorcontrol::can::TalonFX* pAzimuthMotor, sensors::CANCoder* pEncoder, double dDegreeOffset) : frc::SwerveModuleState()
 {
     m_pDriveMotor = pDriveMotor;
     m_pAzimuthMotor = pAzimuthMotor;
-    m_pPot = pPot;
+    m_pEncoder = pEncoder;
     m_dOffset = dDegreeOffset;
     m_pAnglePIDController = new frc2::PIDController(m_dAngleProportional, m_dAngleIntegral, m_dAngleDerivative);
     m_dAngleSetpoint = 0.0;
@@ -46,12 +47,12 @@ CSwerveModule::~CSwerveModule()
 {
     delete m_pDriveMotor;
     delete m_pAzimuthMotor;
-    delete m_pPot;
+    delete m_pEncoder;
     delete m_pAnglePIDController;
 
     m_pDriveMotor = nullptr;
     m_pAzimuthMotor = nullptr;
-    m_pPot = nullptr;
+    m_pEncoder = nullptr;
     m_pAnglePIDController = nullptr;
 }
 
@@ -65,12 +66,19 @@ CSwerveModule::~CSwerveModule()
 void CSwerveModule::Init()
 {
     // Make sure PID input is expecting -180/180.
+    m_pDriveMotor->ConfigSelectedFeedbackSensor(motorcontrol::FeedbackDevice::IntegratedSensor);
+    m_pDriveMotor->Config_kF(0, m_dDriveFeedForward);
+    m_pDriveMotor->Config_kP(0, m_dDriveProportional);
+    m_pDriveMotor->Config_kI(0, m_dDriveIntegral);
+    m_pDriveMotor->Config_kD(0, m_dDriveDerivative);
+
     m_pAnglePIDController->EnableContinuousInput(-180, 180);
     m_pAnglePIDController->SetTolerance(1);
-    m_pDriveMotor->GetEncoder().SetVelocityConversionFactor(((1 / (8.31)) / 60) * (3.1415926  * (4 * 0.0254)));
-    m_pDriveMotor->GetPIDController().SetP(m_dDriveProportional);
-    m_pDriveMotor->GetPIDController().SetI(m_dDriveIntegral);
-    m_pDriveMotor->GetPIDController().SetD(m_dDriveDerivative);
+    m_pAzimuthMotor->SetNeutralMode(motorcontrol::NeutralMode::Brake);
+    m_pAzimuthMotor->ConfigNeutralDeadband(m_dMotorDeadband);
+    m_pEncoder->SetPositionToAbsolute();
+    m_pEncoder->ConfigAbsoluteSensorRange(ctre::phoenix::sensors::AbsoluteSensorRange::Signed_PlusMinus180);
+    m_pEncoder->ConfigSensorInitializationStrategy(sensors::SensorInitializationStrategy::BootToAbsolutePosition);
 }
 
 /************************************************************************//**  
@@ -87,7 +95,7 @@ void CSwerveModule::Tick()
     {
     case eIdle:
         // Stop the motor.
-        m_pAzimuthMotor->Set(0.0);
+        m_pAzimuthMotor->Set(motorcontrol::ControlMode::PercentOutput, 0.0);
         m_bReady = true;
         break;
 
@@ -104,19 +112,19 @@ void CSwerveModule::Tick()
         else
         {
             // Continue to the setpoint.
-            m_pAzimuthMotor->Set(m_pAnglePIDController->Calculate(GetAngle()));
+            m_pAzimuthMotor->Set(motorcontrol::ControlMode::PercentOutput, m_pAnglePIDController->Calculate(GetAngle()));
         }
         break;
 
     case eManualForward:
         // Manually move position forward.
-        m_pAzimuthMotor->Set(0.1);
+        m_pAzimuthMotor->Set(motorcontrol::ControlMode::PercentOutput, 0.1);
         m_bReady = false;
         break;
 
     case eManualReverse:
         // Manually move position backwards.
-        m_pAzimuthMotor->Set(-0.1);
+        m_pAzimuthMotor->Set(motorcontrol::ControlMode::PercentOutput, -0.1);
         m_bReady = false;
         break;
 
@@ -125,7 +133,7 @@ void CSwerveModule::Tick()
     }
 
     // Update module state.
-    this->speed = (units::meters_per_second_t)(m_pDriveMotor->GetEncoder().GetVelocity());
+    this->speed = (units::meters_per_second_t)GetSpeed();
     this->angle = *new frc::Rotation2d(units::degree_t(GetAngle()));
 }
 
@@ -156,9 +164,9 @@ void CSwerveModule::SetAngle(double dAngle)
  ***************************************************************************/
 double CSwerveModule::GetAngle()
 {
-    // Get the voltage, divide it by 5 to get a 0-1 value.
+    // Get the encoder value, divide it by the sensor resolution to get a 0-1 value.
     // Multiply it by 360 to get degrees, add the module's offset, and flip it by 180.
-    return (((-m_pPot->GetVoltage() / 5.0) * 360.0) + m_dOffset) - 180.0;
+    return (m_pEncoder->GetPosition() + m_dOffset);
 }
 
 /************************************************************************//**  
@@ -184,7 +192,8 @@ void CSwerveModule::SetSpeed(double dSpeed)
 {
     // Store variable.
     m_dSpeedSetpoint = dSpeed;
-    m_pDriveMotor->Set(m_dSpeedSetpoint);
+    // Set the speed of the drive.
+    m_pDriveMotor->Set(motorcontrol::ControlMode::Velocity, m_dSpeedSetpoint);
 }
 
 /************************************************************************//**  
@@ -196,7 +205,7 @@ void CSwerveModule::SetSpeed(double dSpeed)
  ***************************************************************************/
 double CSwerveModule::GetSpeed()
 {
-    return m_pDriveMotor->Get();
+    return (m_pDriveMotor->GetSelectedSensorVelocity() / m_dEncoderTicksPerRev) * m_dEncoderConvert;
 }
 
 /************************************************************************//**  
@@ -234,7 +243,7 @@ void CSwerveModule::SetModuleReversed(bool bIsReversed)
 void CSwerveModule::Stop()
 {
     // Make sure the motor is stopped, then move to idle to keep it stopped.
-    m_pAzimuthMotor->StopMotor();
+    m_pAzimuthMotor->Set(motorcontrol::ControlMode::PercentOutput, 0.0);
     m_nState = eIdle;
 }
 
@@ -286,11 +295,10 @@ void CSwerveModule::SetModuleState(frc::SwerveModuleState desiredState)
     // Optimize the desired state, it should never rotate more than 90 degrees.
     desiredState = this->Optimize(desiredState, units::degree_t(GetAngle()));
     // Convert angle and speed to double setpoints.
-    double speedOutput = (desiredState.speed.to<double>());
+    double speedOutput = (desiredState.speed.to<double>() / m_dEncoderConvert * m_dEncoderTicksPerRev);
     double angleOutput = desiredState.angle.Degrees().to<double>();
-    // Set the speed of the drive.
-    m_pDriveMotor->GetPIDController().SetReference(speedOutput, rev::ControlType::kVelocity);
     // Set the setpoint of the angle controller.
     SetAngle(angleOutput);
+    SetSpeed(speedOutput);
 }
 /////////////////////////////////////////////////////////////////////////////
