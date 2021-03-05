@@ -80,10 +80,10 @@ public:
     double GetSelectedTrajectoryTotalTime()     {   return double(m_SelectedTrajectory.TotalTime());        };
 
     // Configure trajectory properties.
-    const meters_per_second_t kMaxTranslationSpeed = 4.0_mps;
-    const meters_per_second_squared_t kMaxTranslationAcceleration = 7.2_mps_sq;
-    const radians_per_second_t kMaxRotationSpeed = 6.28_rad_per_s;
-    const radians_per_second_t kMaxRotationAcceleration = 3.14_rad_per_s;
+    const meters_per_second_t kMaxTranslationSpeed = 3.8_mps;
+    const meters_per_second_squared_t kMaxTranslationAcceleration = 5.9_mps_sq;
+    const radians_per_second_t kMaxRotationSpeed = 3.8_rad_per_s;
+    const radians_per_second_t kMaxRotationAcceleration = 5.4_rad_per_s;
 
     // Preset Teleop Trajectory.
     vector<Pose2d> PresetWaypoints

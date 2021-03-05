@@ -67,6 +67,7 @@ void CSwerveModule::Init()
 {
     // Make sure PID input is expecting -180/180.
     m_pDriveMotor->ConfigSelectedFeedbackSensor(motorcontrol::FeedbackDevice::IntegratedSensor);
+    m_pDriveMotor->SetNeutralMode(motorcontrol::NeutralMode::Brake);
     m_pDriveMotor->Config_kF(0, m_dDriveFeedForward);
     m_pDriveMotor->Config_kP(0, m_dDriveProportional);
     m_pDriveMotor->Config_kI(0, m_dDriveIntegral);

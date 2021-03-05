@@ -25,20 +25,20 @@ using namespace frc2;
 using namespace ctre::phoenix;
 using namespace units;
 
-const double m_dJoystickDeadzone  = 0.12;
-const double m_dTeleopMultiplier  = 3.0;
+const double m_dJoystickDeadzone  = 0.1;
+const double m_dTeleopMultiplier  = 4.0;
 // PID gains for the X translation.
-const double m_dPIDXkP            = 0.05;
-const double m_dPIDXkI            = 0.00;
-const double m_dPIDXkD            = 0.00;
+const double m_dPIDXkP            = 3.2;
+const double m_dPIDXkI            = 3.2;
+const double m_dPIDXkD            = 0.5;
 // PID gains for the Y translation
-const double m_dPIDYkP            = 0.05;
-const double m_dPIDYkI            = 0.00;
-const double m_dPIDYkD            = 0.00;
+const double m_dPIDYkP            = 3.0;
+const double m_dPIDYkI            = 3.0;
+const double m_dPIDYkD            = 0.4;
 // PID gains for the Theta rotation.
-const double m_dPIDThetakP        = 0.5;
-const double m_dPIDThetakI        = 0.00;
-const double m_dPIDThetakD        = 0.00;
+const double m_dPIDThetakP        = 5.0;
+const double m_dPIDThetakI        = 2.2;
+const double m_dPIDThetakD        = 0.4;
 // Setup the swerve kinematics.
 const Translation2d FrontLeft                      = Translation2d((inch_t)(dWidth / 2), (inch_t)(dLength / 2));
 const Translation2d FrontRight                     = Translation2d((inch_t)(dWidth / 2), (inch_t)(-dLength / 2));

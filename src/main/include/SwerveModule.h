@@ -19,15 +19,15 @@ using namespace ctre::phoenix;
 
 const int    m_dEncoderTicksPerRev  = 2048;
 const double m_dEncoderConvert      = ((1 / (8.16)) * 10) * (3.1415926  * (4 * 0.0254));
-const double m_dDriveProportional   = 0.0013;
-const double m_dDriveIntegral       = 0.0000;
-const double m_dDriveDerivative     = 0.0001;
-const double m_dDriveFeedForward    = 0.0466;
-const double m_dAngleProportional   = 0.0064;
-const double m_dAngleIntegral       = 0.0000;
-const double m_dAngleDerivative     = 0.0100; // This might do something. 
+const double m_dDriveProportional   = 0.003;
+const double m_dDriveIntegral       = 0.000;
+const double m_dDriveDerivative     = 0.000;
+const double m_dDriveFeedForward    = 0.049;
+const double m_dAngleProportional   = 0.0072;
+const double m_dAngleIntegral       = 0.0045;
+const double m_dAngleDerivative     = 0.000; // This might do something. 
 const double m_dAngleTolerance      = 1.0000;
-const double m_dMotorDeadband       = 0.0300;
+const double m_dMotorDeadband       = 0.000;
 /////////////////////////////////////////////////////////////////////////////
 
 

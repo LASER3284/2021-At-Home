@@ -70,7 +70,7 @@ private:
     rev::CANSparkMax*		m_pLeftShooter;
     rev::CANSparkMax*		m_pRightShooter;
     DigitalOutput*          m_pVisionSwitch;
-    Timer*					m_pTimer;
+    frc::Timer*					m_pTimer;
 
     // Declare variables.
     bool			m_bIsReady;

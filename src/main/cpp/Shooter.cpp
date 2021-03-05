@@ -90,6 +90,11 @@ void CShooter::Init()
     // Set the neutral mode of the Shooter to coast.
     m_pLeftShooter->SetIdleMode(CANSparkMax::IdleMode::kCoast);
     m_pRightShooter->SetIdleMode(CANSparkMax::IdleMode::kCoast);
+    // Set the shooters to only apply power in one direction.
+    m_pLeftShooter->SetSoftLimit(CANSparkMax::SoftLimitDirection::kReverse, 0);
+    m_pRightShooter->SetSoftLimit(CANSparkMax::SoftLimitDirection::kReverse, 0);
+    m_pLeftShooter->EnableSoftLimit(CANSparkMax::SoftLimitDirection::kReverse, true);
+    m_pRightShooter->EnableSoftLimit(CANSparkMax::SoftLimitDirection::kReverse, true);
     // Set acceleration (seconds from neutral to full output).
     m_pLeftShooter->SetClosedLoopRampRate(dShooterClosedLoopRamp);
     m_pRightShooter->SetClosedLoopRampRate(dShooterClosedLoopRamp);
@@ -202,7 +207,6 @@ void CShooter::SetSetpoint(double dSetpoint)
 
     // Set the member variable.
     m_dSetpoint = dSetpoint;
-
     // Give the PID controller a setpoint.
     if (m_bMotionMagic)
     {
