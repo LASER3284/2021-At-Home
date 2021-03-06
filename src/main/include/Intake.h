@@ -41,7 +41,7 @@ public:
 
 private:
     // Object pointers. 
-    WPI_TalonSRX*		m_pIntakeMotor;
+    // WPI_TalonSRX*		m_pIntakeMotor;
     Solenoid*			m_pIntakeActuator;
     frc::Timer*         m_pTimer;
 

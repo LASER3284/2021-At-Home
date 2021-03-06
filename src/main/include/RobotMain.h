@@ -50,6 +50,7 @@ private:
         eTeleopIntake,
         eTeleopAiming,
         eTeleopFiring,
+        eTeleopCloseRangeFiring,
         eTeleopAutoFiring,
         eTeleopGeneratePath,
         eTeleopFollowing

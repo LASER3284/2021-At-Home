@@ -82,6 +82,7 @@ void CRobotMain::RobotInit()
     m_pIntake->Init();
     m_pTurret->Init();
     m_pShooter->Init();
+    m_pHopper->Init();
 
 	// Put autonomous modes on the dashboard.
 	m_pAutonomousChooser->SetDefaultOption("Autonomous Idle", "Autonomous Idle");
@@ -314,9 +315,29 @@ void CRobotMain::TeleopPeriodic()
     }
 
     /********************************************************************
+        Drive Controller - Close Range Fire (Left Bumper)
+    ********************************************************************/
+    if (m_pDriveController->GetRawButton(eButtonLB))
+    {
+        // Set state to Firing.
+        m_nTeleopState = eTeleopCloseRangeFiring;
+        bHasFired = true;
+    }
+    else
+    {
+        if (bHasFired)
+        {
+            // Has been fired, return to idle.
+            m_pShooter->SetState(eShooterIdle);
+            m_nTeleopState = eTeleopStopped;
+            bHasFired = false;
+        }
+    }
+
+    /********************************************************************
         Drive Controller - AutoFire (Right Trigger + Aux Right Trigger)
     ********************************************************************/
-    if ((m_pDriveController->GetRawAxis(eRightTrigger) >= 0.65) && (m_pAuxController->GetRawAxis(eRightTrigger) >= 0.65))
+    if ((m_pDriveController->GetRawAxis(eLeftTrigger) >= 0.65) && (m_pAuxController->GetRawAxis(eRightTrigger) >= 0.65))
     {
         // Set the state to AutoFire.
         m_nTeleopState = eTeleopAutoFiring;
@@ -436,12 +457,12 @@ void CRobotMain::TeleopPeriodic()
 	/********************************************************************
         Aux Controller - Vision Aiming (Right Trigger)
     ********************************************************************/
-    if ((m_pAuxController->GetRawAxis(eRightTrigger) > 0.65) && !(m_pDriveController->GetRawAxis(eRightTrigger) > 0.65))
+    if ((m_pAuxController->GetRawAxis(eRightTrigger) > 0.65) && !(m_pDriveController->GetRawAxis(eLeftTrigger) > 0.65))
     {
         // Set state to Aiming.
         m_nTeleopState = eTeleopAiming;
     }
-    if (!(m_pAuxController->GetRawAxis(eRightTrigger) > 0.65) && !(m_pDriveController->GetRawAxis(eRightTrigger) > 0.65))
+    if (!(m_pAuxController->GetRawAxis(eRightTrigger) > 0.65) && !(m_pDriveController->GetRawAxis(eLeftTrigger) > 0.65))
     {
         // If released while still in aiming...
         if (m_nTeleopState == eTeleopAiming)
@@ -477,11 +498,11 @@ void CRobotMain::TeleopPeriodic()
     {
         case eTeleopStopped : 
 			// Disable LEDs
-            m_pShooter->SetVisionLED(false);
+            m_pShooter->SetVisionLED(true);
             m_pTurret->SetVision(false);
             // Return intake to it's retracted state.
             m_pIntake->Extend(false);
-            m_pIntake->IntakeMotor(false);
+            // m_pIntake->IntakeMotor(false);
             // Return Lift arm to it's lower position.
             // m_pLift->ExtendArm(false);
             // Idle the arm.
@@ -515,7 +536,7 @@ void CRobotMain::TeleopPeriodic()
             // Start intake on a half second delay.
             if ((m_pTimer->Get() - m_dStartTime) >= 0.5)
             {
-                m_pIntake->IntakeMotor(true);
+                // m_pIntake->IntakeMotor(true);
             }
             // Stop Shooter, stop Turret, and stop Hood.
             m_pShooter->Stop();
@@ -541,7 +562,7 @@ void CRobotMain::TeleopPeriodic()
             // Stop Preloader.
             m_pHopper->Preload(false);
             // Set the Hood to tracking mode.
-            m_pHood->SetSetpoint(SmartDashboard::GetNumber("Target Distance", 0.0));
+            // m_pHood->SetSetpoint(SmartDashboard::GetNumber("Target Distance", 0.0));
             break;
         
         case eTeleopFiring :
@@ -559,6 +580,28 @@ void CRobotMain::TeleopPeriodic()
             m_pTurret->SetState(eTurretIdle);
             // Set the Shooter to firing speed.
             m_pShooter->SetSetpoint(dShooterFiringVelocity);
+            if (m_pShooter->IsAtSetpoint())
+            {
+                // Start preloading into the shooter.
+                m_pHopper->Preload(true);
+            }
+            break;
+
+        case eTeleopCloseRangeFiring :
+            /********************************************************************
+                Close RangeFiring - Robot simply fires wherever it is currently aiming.
+            ********************************************************************/
+            // Return Lift arm to it's lower position.
+            // m_pLift->ExtendArm(false);
+            // Idle the arm.
+            // m_pLift->ReverseIdle(true);
+            // Enabled LEDs
+            m_pShooter->SetVisionLED(false);
+            m_pTurret->SetVision(false);
+            // Set the Turret to idle, we don't want it to move.
+            m_pTurret->SetState(eTurretIdle);
+            // Set the Shooter to firing speed.
+            m_pShooter->SetSetpoint(dShooterCloseRangeVelocity);
             if (m_pShooter->IsAtSetpoint())
             {
                 // Start preloading into the shooter.

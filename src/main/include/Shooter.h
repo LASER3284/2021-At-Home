@@ -25,6 +25,7 @@ const double dShooterManualRevSpeed		=	 -0.500;
 const double dShooterMaxVelocity		= 	5700.00;
 const double dShooterIdleVelocity		=	2400.00;
 const double dShooterFiringVelocity     =   4500.00;
+const double dShooterCloseRangeVelocity =   3000.00;
 const double dShooterMinVelocity		=	 200.00;
 const double dShooterProportional       =      4e-4;
 const double dShooterIntegral           =       0.0;

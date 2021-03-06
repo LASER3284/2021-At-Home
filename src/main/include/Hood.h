@@ -19,7 +19,7 @@ using namespace frc;
 using namespace rev;
 
 // Hood Constants.
-const double dHoodMaxPosition			=     400.0;
+const double dHoodMaxPosition			=    1000.0;
 const double dHoodMinPosition			=     0.000;
 const double dHoodManualFwdSpeed 		=     0.150;
 const double dHoodManualRevSpeed		=    -0.150;
@@ -33,8 +33,8 @@ const double dHoodDerivative            = 0.0000001;
 const double dHoodFeedForward           =      0.01;
 const double dHoodTolerance             =      0.25;
 const double dHoodFindingTime           =       0.0;
-const double dHoodPresetPositionFar     =     250.0;
-const double dHoodPresetPositionNear    =     100.0;
+const double dHoodPresetPositionFar     =     560.0;
+const double dHoodPresetPositionNear    =     150.0;
 
 
 // Hood enum.

@@ -6,8 +6,7 @@
 ****************************************************************************/
 #include "Hopper.h"
 
-using namespace frc;
-using namespace rev;
+using namespace ctre::phoenix;
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -19,7 +18,7 @@ using namespace rev;
 CHopper::CHopper()
 {
     // Create Object Pointers.
-    m_pShooterFeeder	= new CANSparkMax(nPreloadMotor, CANSparkMax::MotorType::kBrushless);
+    m_pShooterFeeder	= new motorcontrol::can::TalonFX(nPreloadMotor);
 }
 
 /****************************************************************************
@@ -44,7 +43,7 @@ CHopper::~CHopper()
 void CHopper::Init()
 {
     // Turn off shooter preload.
-    m_pShooterFeeder->Set(0.00);
+    m_pShooterFeeder->Set(motorcontrol::ControlMode::PercentOutput, 0.00);
 }
 
 /****************************************************************************
@@ -57,12 +56,12 @@ void CHopper::Preload(bool bEnabled)
     if (bEnabled)
     {
         // Start preloading into the shooter.
-        m_pShooterFeeder->Set(dHopperPreloadSpeed);
+        m_pShooterFeeder->Set(motorcontrol::ControlMode::PercentOutput, dHopperPreloadSpeed);
     }
     else
     {
         // Stop the preloader.
-        m_pShooterFeeder->Set(0.00);
+        m_pShooterFeeder->Set(motorcontrol::ControlMode::PercentOutput, 0.00);
     }
 }
 /////////////////////////////////////////////////////////////////////////////

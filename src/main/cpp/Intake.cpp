@@ -20,7 +20,7 @@ using namespace ctre;
 CIntake::CIntake()
 {
     // Create Object Pointers.
-    m_pIntakeMotor		= new WPI_TalonSRX(nIntakeMotor);
+    // m_pIntakeMotor		= new WPI_TalonSRX(nIntakeMotor);
     m_pIntakeActuator	= new Solenoid(nIntakeSolenoid);
     m_pTimer            = new Timer();
 }
@@ -33,11 +33,11 @@ CIntake::CIntake()
 CIntake::~CIntake()
 {
     // Delete objects.
-    delete m_pIntakeMotor;
+    // delete m_pIntakeMotor;
     delete m_pIntakeActuator;
 
     // Set objects to nullptrs.
-    m_pIntakeMotor		= nullptr;
+    // m_pIntakeMotor		= nullptr;
     m_pIntakeActuator	= nullptr;
 }
 
@@ -52,7 +52,7 @@ void CIntake::Init()
     Extend(false);
 
     // Turn off Intake Motor.
-    IntakeMotor(false);
+    // IntakeMotor(false);
 }
 
 /****************************************************************************
@@ -84,14 +84,14 @@ bool CIntake::GetExtended()
 ****************************************************************************/
 void CIntake::IntakeMotor(bool bStartIntake)
 {
-    if (bStartIntake)
-    {
-        m_pIntakeMotor->Set(dIntakeFwdSpeed);
-    }
-    else
-    {
-        m_pIntakeMotor->Set(0.0);
-    }
+    // if (bStartIntake)
+    // {
+    //     m_pIntakeMotor->Set(dIntakeFwdSpeed);
+    // }
+    // else
+    // {
+    //     m_pIntakeMotor->Set(0.0);
+    // }
     
 }
 
@@ -102,6 +102,6 @@ void CIntake::IntakeMotor(bool bStartIntake)
 ****************************************************************************/
 double CIntake::GetIntakeCurrent()
 {
-    return m_pIntakeMotor->GetStatorCurrent();
+    // return m_pIntakeMotor->GetStatorCurrent();
 }
 /////////////////////////////////////////////////////////////////////////////

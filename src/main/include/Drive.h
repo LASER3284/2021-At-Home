@@ -28,17 +28,17 @@ using namespace units;
 const double m_dJoystickDeadzone  = 0.1;
 const double m_dTeleopMultiplier  = 4.0;
 // PID gains for the X translation.
-const double m_dPIDXkP            = 3.2;
-const double m_dPIDXkI            = 3.2;
-const double m_dPIDXkD            = 0.5;
+const double m_dPIDXkP            = 3.0;
+const double m_dPIDXkI            = 2.3;
+const double m_dPIDXkD            = 0.02;
 // PID gains for the Y translation
 const double m_dPIDYkP            = 3.0;
-const double m_dPIDYkI            = 3.0;
-const double m_dPIDYkD            = 0.4;
+const double m_dPIDYkI            = 2.3;
+const double m_dPIDYkD            = 0.02;
 // PID gains for the Theta rotation.
-const double m_dPIDThetakP        = 5.0;
-const double m_dPIDThetakI        = 2.2;
-const double m_dPIDThetakD        = 0.4;
+const double m_dPIDThetakP        = 4.5;
+const double m_dPIDThetakI        = 1.5;
+const double m_dPIDThetakD        = 0.2;
 // Setup the swerve kinematics.
 const Translation2d FrontLeft                      = Translation2d((inch_t)(dWidth / 2), (inch_t)(dLength / 2));
 const Translation2d FrontRight                     = Translation2d((inch_t)(dWidth / 2), (inch_t)(-dLength / 2));

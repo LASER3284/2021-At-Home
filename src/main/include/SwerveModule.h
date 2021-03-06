@@ -18,13 +18,13 @@
 using namespace ctre::phoenix;
 
 const int    m_dEncoderTicksPerRev  = 2048;
-const double m_dEncoderConvert      = ((1 / (8.16)) * 10) * (3.1415926  * (4 * 0.0254));
-const double m_dDriveProportional   = 0.003;
+const double m_dEncoderConvert      = ((1 / (8.16)) * 10) * (3.1415926  * (3.9 * 0.0254));
+const double m_dDriveProportional   = 0.002;
 const double m_dDriveIntegral       = 0.000;
 const double m_dDriveDerivative     = 0.000;
 const double m_dDriveFeedForward    = 0.049;
-const double m_dAngleProportional   = 0.0072;
-const double m_dAngleIntegral       = 0.0045;
+const double m_dAngleProportional   = 0.0073;
+const double m_dAngleIntegral       = 0.0048;
 const double m_dAngleDerivative     = 0.000; // This might do something. 
 const double m_dAngleTolerance      = 1.0000;
 const double m_dMotorDeadband       = 0.000;
@@ -52,8 +52,7 @@ class CSwerveModule: public frc::SwerveModuleState
   double    GetAngle();
   double    GetAngleSetpoint();
   void      SetSpeed(double dSpeed);
-  double    GetSpeed();
-  double    GetSpeedSetpoint();
+  double    GetSpeed();  double    GetSpeedSetpoint();
   void      SetModuleReversed(bool bIsReversed);
   void      SetState(int nState);
   int       GetState();

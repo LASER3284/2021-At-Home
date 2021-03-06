@@ -7,11 +7,10 @@
 #ifndef Hopper_h
 #define Hopper_h
 
-#include <rev/CANSparkMax.h>
+#include <ctre/phoenix/motorcontrol/can/TalonFX.h>
 #include "IOMap.h"
 
-using namespace frc;
-using namespace rev;
+using namespace ctre::phoenix;
 
 // Hopper Contants.
 const double dHopperPreloadSpeed  	= 1.0;
@@ -35,7 +34,7 @@ public:
 
 private:
     // Object pointers.
-    CANSparkMax*        m_pShooterFeeder;
+    motorcontrol::can::TalonFX*     m_pShooterFeeder;
 };
 /////////////////////////////////////////////////////////////////////////////
 #endif

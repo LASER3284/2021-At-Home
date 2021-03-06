@@ -38,10 +38,10 @@ CDrive::CDrive(frc::Joystick* pDriveController)
     m_pEncoderBackLeft          = new sensors::CANCoder(nEncoderBackLeft);
     m_pEncoderBackRight         = new sensors::CANCoder(nEncoderBackRight);
     // Create our 4 swerve modules.
-    m_pModFrontLeft             = new CSwerveModule(m_pDriveMotorFrontLeft, m_pAzimuthMotorFrontLeft, m_pEncoderFrontLeft, 67);
+    m_pModFrontLeft             = new CSwerveModule(m_pDriveMotorFrontLeft, m_pAzimuthMotorFrontLeft, m_pEncoderFrontLeft, 65);
     m_pModFrontRight            = new CSwerveModule(m_pDriveMotorFrontRight, m_pAzimuthMotorFrontRight, m_pEncoderFrontRight, -150);
     m_pModBackLeft              = new CSwerveModule(m_pDriveMotorBackLeft, m_pAzimuthMotorBackLeft, m_pEncoderBackLeft, -113);
-    m_pModBackRight             = new CSwerveModule(m_pDriveMotorBackRight, m_pAzimuthMotorBackRight, m_pEncoderBackRight, -160);
+    m_pModBackRight             = new CSwerveModule(m_pDriveMotorBackRight, m_pAzimuthMotorBackRight, m_pEncoderBackRight, -161);
     // Create the NavX Gyro.
     m_pGyro                     = new AHRS(SerialPort::Port::kUSB);
     // Create Odometry. Start at -1 to prevent an error.
@@ -220,8 +220,7 @@ void CDrive::Tick()
     SmartDashboard::PutNumber("FrontLeft SpeedSP", m_pModFrontLeft->GetSpeedSetpoint() / 2048 * 0.391159);
     SmartDashboard::PutNumber("FrontRight SpeedSP", m_pModFrontRight->GetSpeedSetpoint() / 2048 * 0.391159);
     SmartDashboard::PutNumber("BackLeft SpeedSP", m_pModBackLeft->GetSpeedSetpoint() / 2048 * 0.391159);
-    SmartDashboard::PutNumber("BackRight SpeedSP", m_pModBackRight->GetSpeedSetpoint() / 2048 * 0.391159
-    );
+    SmartDashboard::PutNumber("BackRight SpeedSP", m_pModBackRight->GetSpeedSetpoint() / 2048 * 0.391159);
 
     SmartDashboard::PutNumber("FrontLeft Angle", m_pModFrontLeft->GetAngle());
     SmartDashboard::PutNumber("FrontRight Angle", m_pModFrontRight->GetAngle());
