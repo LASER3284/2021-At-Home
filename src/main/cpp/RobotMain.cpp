@@ -294,6 +294,23 @@ void CRobotMain::TeleopPeriodic()
     static bool bTurretMoving       = false;
     static bool bHoodMoving         = false;
 
+    /********************************************************************
+        Drive Controller - Toggle Intake (Right Bumper)
+    ********************************************************************/
+    if (m_pDriveController->GetRawButtonPressed(eButtonRB))
+    {
+        if (m_nTeleopState == eTeleopIntake)
+        {
+            // Leave to idle.
+            m_nTeleopState = eTeleopStopped;
+        }
+        else
+        {
+            // Start intaking.
+            m_nTeleopState = eTeleopIntake;
+        }
+    }
+
 	/********************************************************************
         Drive Controller - Fire (Left Trigger)
     ********************************************************************/
@@ -562,7 +579,7 @@ void CRobotMain::TeleopPeriodic()
             // Stop Preloader.
             m_pHopper->Preload(false);
             // Set the Hood to tracking mode.
-            // m_pHood->SetSetpoint(SmartDashboard::GetNumber("Target Distance", 0.0));
+            m_pHood->SetSetpoint(SmartDashboard::GetNumber("Target Distance", 0.0));
             break;
         
         case eTeleopFiring :

@@ -13,7 +13,7 @@
 using namespace ctre::phoenix;
 
 // Hopper Contants.
-const double dHopperPreloadSpeed  	= 1.0;
+const double dHopperPreloadSpeed  	= 0.7;
 /////////////////////////////////////////////////////////////////////////////
 
 
