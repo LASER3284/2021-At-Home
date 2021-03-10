@@ -3,7 +3,9 @@
  * 
  *  Classes:		CShooter
  * 
- *  Project:		Swerve Drive
+ *  Project:		2021 Infinite Recharge At-Home Robot Code.
+ * 
+ *  Copyright © 2021 FIRST Team 3284 - Camdenton LASER Robotics.
 ****************************************************************************/
 #ifndef Shooter_h
 #define Shooter_h

@@ -1,11 +1,11 @@
 /****************************************************************************  
- *	Implements the SwerveModule class.
- *
- *	Classes:		CSwerveModule
- *
- *	Project:		Swerve Drive
- *
- * 	Copyright © 2021 FIRST Team 3284 - Camdenton LASER Robotics.
+ 	Implements the SwerveModule class.
+ 
+ 	Classes:		CSwerveModule
+ 
+ 	Project:		2021 Infinite Recharge At-Home Robot Code.
+ 
+  	Copyright © 2021 FIRST Team 3284 - Camdenton LASER Robotics.
  ***************************************************************************/
 #include "SwerveModule.h"
 #include <frc/smartdashboard/SmartDashboard.h>

@@ -1,8 +1,11 @@
 /****************************************************************************
     Description:	Defines the Poses used for autonomous.
+
     Classes:		CTrajectoryConstants
-    Project:		2020 Infinite Recharge Robot Code.
-    Copyright 2020 First Team 3284 - Camdenton LASER Robotics.
+
+    Project:		2021 Infinite Recharge At-Home Robot Code.
+
+    Copyright © 2021 FIRST Team 3284 - Camdenton LASER Robotics.
 ****************************************************************************/
 #ifndef TrajectoryConstants_h
 #define TrajectoryConstants_h

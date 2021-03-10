@@ -3,7 +3,9 @@
  *
  *	Classes:		CRobotMain
  *
- *	Project:		Swerve Drive
+ *	Project:		2021 Infinite Recharge At-Home Robot Code.
+ *
+ *   Copyright © 2021 FIRST Team 3284 - Camdenton LASER Robotics.
  ****************************************************************************/
 #include "RobotMain.h"
 /////////////////////////////////////////////////////////////////////////////
@@ -28,6 +30,7 @@ CRobotMain::CRobotMain()
 	m_pShooter					= new CShooter();
 	m_pHood						= new CHood();
 	m_pHopper					= new CHopper();
+    m_pLift                     = new CLift();
 	m_pAutonomousChooser		= new SendableChooser<string>();
 	m_pCompressor				= new frc::Compressor();
 
@@ -54,6 +57,7 @@ CRobotMain::~CRobotMain()
 	delete m_pShooter;
 	delete m_pHood;
 	delete m_pHopper;
+    delete m_pLift;
 	delete m_pAutonomousChooser;
 
 	m_pTimer				= nullptr;
@@ -64,6 +68,7 @@ CRobotMain::~CRobotMain()
 	m_pShooter				= nullptr;
 	m_pHood					= nullptr;
 	m_pHopper				= nullptr;
+    m_pLift                 = nullptr;
 	m_pAutonomousChooser	= nullptr;
 }
 
@@ -83,6 +88,7 @@ void CRobotMain::RobotInit()
     m_pTurret->Init();
     m_pShooter->Init();
     m_pHopper->Init();
+    m_pLift->Init();
 
 	// Put autonomous modes on the dashboard.
 	m_pAutonomousChooser->SetDefaultOption("Autonomous Idle", "Autonomous Idle");
@@ -332,6 +338,28 @@ void CRobotMain::TeleopPeriodic()
     }
 
     /********************************************************************
+        Aux Controller - Lift Robot (Right Stick)
+    ********************************************************************/
+    if (m_pAuxController->GetRawButtonPressed(eButtonRS))
+    {
+        // Toggle the lift of the robot.
+        m_pLift->ExtendLift(!m_pLift->IsExtended());
+        
+        // Check for driver safety.
+        if (m_pLift->IsExtended())
+        {
+            // Disable driver control.
+            m_pRobotDrive->SetJoystickControl(false);
+        }
+        else
+        {
+            // Enable driver control.
+            m_pRobotDrive->SetJoystickControl(true);
+        }
+        
+    }
+
+    /********************************************************************
         Drive Controller - Close Range Fire (Left Bumper)
     ********************************************************************/
     if (m_pDriveController->GetRawButton(eButtonLB))
@@ -521,9 +549,7 @@ void CRobotMain::TeleopPeriodic()
             m_pIntake->Extend(false);
             // m_pIntake->IntakeMotor(false);
             // Return Lift arm to it's lower position.
-            // m_pLift->ExtendArm(false);
-            // Idle the arm.
-            // m_pLift->ReverseIdle(true);
+            m_pLift->ExtendLift(false);
             // Idle the Hood, Turret, and Hopper.
             m_pHood->SetState(eHoodReset);
             // m_pTurret->Stop();
@@ -545,9 +571,7 @@ void CRobotMain::TeleopPeriodic()
             m_pShooter->SetVisionLED(false);
             m_pTurret->SetVision(false);
             // Return Lift arm to it's lower position.
-            // m_pLift->ExtendArm(false);
-            // Idle the arm.
-            // m_pLift->ReverseIdle(true);
+            m_pLift->ExtendLift(false);
             // Extend intake.
             m_pIntake->Extend(true);
             // Start intake on a half second delay.
@@ -567,9 +591,7 @@ void CRobotMain::TeleopPeriodic()
                          using the Vision points determined.
             ********************************************************************/
             // Return Lift arm to it's lower position.
-            // m_pLift->ExtendArm(false);
-            // Idle the arm.
-            // m_pLift->ReverseIdle(true);
+            m_pLift->ExtendLift(false);
             // Set the Turret to tracking mode.
             m_pTurret->SetVision(true);
             // Enabled LEDs
@@ -587,10 +609,8 @@ void CRobotMain::TeleopPeriodic()
                 Firing - Robot simply fires wherever it is currently aiming.
             ********************************************************************/
             // Return Lift arm to it's lower position.
-            // m_pLift->ExtendArm(false);
-            // Idle the arm.
-            // m_pLift->ReverseIdle(true);
-            // Enabled LEDs
+            m_pLift->ExtendLift(false);
+            // Don't vision track.
             m_pShooter->SetVisionLED(false);
             m_pTurret->SetVision(false);
             // Set the Turret to idle, we don't want it to move.
@@ -608,11 +628,9 @@ void CRobotMain::TeleopPeriodic()
             /********************************************************************
                 Close RangeFiring - Robot simply fires wherever it is currently aiming.
             ********************************************************************/
-            // Return Lift arm to it's lower position.
-            // m_pLift->ExtendArm(false);
-            // Idle the arm.
-            // m_pLift->ReverseIdle(true);
-            // Enabled LEDs
+            // Lift the front of the robot.
+            m_pLift->ExtendLift(true);
+            // Don't vision track.
             m_pShooter->SetVisionLED(false);
             m_pTurret->SetVision(false);
             // Set the Turret to idle, we don't want it to move.

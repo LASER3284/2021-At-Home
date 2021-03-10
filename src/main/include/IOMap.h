@@ -3,7 +3,9 @@
 
     Classes:		None
 
-    Project:		Swerve Drive
+    Project:		2021 Infinite Recharge At-Home Robot Code.
+
+    Copyright © 2021 FIRST Team 3284 - Camdenton LASER Robotics.
 ****************************************************************************/
 #pragma once
 /////////////////////////////////////////////////////////////////////////////
@@ -34,6 +36,7 @@ const int nTurretMotor                  =  18;      //  Spark MAX ID for turret 
 
 // Solenoid Channels.
 const int nIntakeSolenoid               =   0;      // Solenoid channel for the intake.
+const int nLiftSolenoid                 =   1;      // Solenoid chennel for the lift.
 
 // Digital Channels
 const int nVisionLEDChannel             =   0;      //  Digital channel ID for LED control line

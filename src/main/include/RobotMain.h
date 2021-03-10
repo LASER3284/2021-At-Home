@@ -2,8 +2,10 @@
  *  Defines the RobotMain class.
  *
  *	Classes:		CRobotMain
-*
-*	Project:		Swerve Drive
+ *
+ *	Project:		2021 Infinite Recharge At-Home Robot Code.
+ *
+ *  Copyright © 2021 FIRST Team 3284 - Camdenton LASER Robotics.
 ***************************************************************************/
 #pragma once
 
@@ -13,6 +15,7 @@
 #include "Shooter.h"
 #include "Hood.h"
 #include "Hopper.h"
+#include "Lift.h"
 #include <frc/Timer.h>
 #include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -78,6 +81,7 @@ private:
     CShooter*                   m_pShooter;
     CHood*                      m_pHood;
     CHopper*                    m_pHopper;
+    CLift*                      m_pLift;
     SendableChooser<string>*    m_pAutonomousChooser;
     frc::Compressor*            m_pCompressor;
 

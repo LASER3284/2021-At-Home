@@ -3,7 +3,9 @@
  *  
  *  Classes:		CDrive
  *  
- *  Project:		Swerve Drive
+ *  Project:		2021 Infinite Recharge At-Home Robot Code.
+ * 
+ *  Copyright © 2021 FIRST Team 3284 - Camdenton LASER Robotics.
 ****************************************************************************/
 #pragma once
 
@@ -70,6 +72,7 @@ class CDrive
   void            GenerateTrajectoryFromCurrentPosition();
   void            FollowTrajectory(double dElapsedTime);
   double          GetYaw();
+  bool            GetJoystickControl()          {  return m_bJoystickControl;  };
 
  private:     
   // Object pointers.     

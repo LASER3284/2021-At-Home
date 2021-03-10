@@ -1,8 +1,11 @@
 /****************************************************************************
     Description:	Implements the CIntake control class.
+
     Classes:		CIntake
-    Project:		2020 Infinite Recharge Robot Code.
-    Copyright 2020 First Team 3284 - Camdenton LASER Robotics.
+
+    Project:		2021 Infinite Recharge At-Home Robot Code.
+
+    Copyright © 2021 FIRST Team 3284 - Camdenton LASER Robotics.
 ****************************************************************************/
 #include "Intake.h"
 

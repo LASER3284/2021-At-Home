@@ -3,7 +3,9 @@
 
 	Classes:		CDrive
 
-	Project:		Swerve Drive
+	Project:		2021 Infinite Recharge At-Home Robot Code.
+
+    Copyright © 2021 FIRST Team 3284 - Camdenton LASER Robotics.
 ****************************************************************************/
 #include "Drive.h"
 #include <frc/smartdashboard/SmartDashboard.h>
