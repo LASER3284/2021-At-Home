@@ -85,8 +85,8 @@ public:
     // Configure trajectory properties.
     const meters_per_second_t kMaxTranslationSpeed = 4.0_mps;
     const meters_per_second_squared_t kMaxTranslationAcceleration = 3_mps_sq;
-    const radians_per_second_t kMaxRotationSpeed = 3.8_rad_per_s;
-    const radians_per_second_t kMaxRotationAcceleration = 5.4_rad_per_s;
+    const radians_per_second_t kMaxRotationSpeed = 3.0_rad_per_s;
+    const radians_per_second_t kMaxRotationAcceleration = 4.0_rad_per_s;
 
     // Preset Teleop Trajectory.
     vector<Pose2d> PresetWaypoints

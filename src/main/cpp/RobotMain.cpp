@@ -346,7 +346,7 @@ void CRobotMain::TeleopPeriodic()
         m_pLift->ExtendLift(!m_pLift->IsExtended());
         
         // Check for driver safety.
-        if (m_pLift->IsExtended())
+        if (!m_pLift->IsExtended())
         {
             // Disable driver control.
             m_pRobotDrive->SetJoystickControl(false);
@@ -548,6 +548,8 @@ void CRobotMain::TeleopPeriodic()
             // Return intake to it's retracted state.
             m_pIntake->Extend(false);
             // m_pIntake->IntakeMotor(false);
+            // Enable joystick control.
+            m_pRobotDrive->SetJoystickControl(true);
             // Return Lift arm to it's lower position.
             m_pLift->ExtendLift(false);
             // Idle the Hood, Turret, and Hopper.
@@ -628,6 +630,8 @@ void CRobotMain::TeleopPeriodic()
             /********************************************************************
                 Close RangeFiring - Robot simply fires wherever it is currently aiming.
             ********************************************************************/
+            // Disable robot control.
+            m_pRobotDrive->SetJoystickControl(false);
             // Lift the front of the robot.
             m_pLift->ExtendLift(true);
             // Don't vision track.
