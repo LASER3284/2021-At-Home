@@ -257,15 +257,23 @@ void CRobotMain::AutonomousPeriodic()
 			break;
 
 		case eSingASong :
-			// Sing a song...
+			// Sing a song!
+            if (!m_pRobotDrive->GetOrchestra()->IsPlaying())
+            {
+                m_pRobotDrive->GetOrchestra()->LoadMusic(kSong);
+                m_pRobotDrive->GetOrchestra()->Play();
+            }
 			break;
 	}
 
 	// Call drive tick.
-	m_pRobotDrive->Tick();
-	m_pShooter->Tick();
-	m_pHood->Tick();
-	m_pTurret->Tick();
+    if (m_nAutoState != eSingASong)
+    {
+        m_pRobotDrive->Tick();
+	    m_pShooter->Tick();
+	    m_pHood->Tick();
+	    m_pTurret->Tick();   
+    }
 }
 
 /************************************************************************//**
@@ -283,6 +291,9 @@ void CRobotMain::TeleopInit()
 
 	// Turn off vision LEDs.
 	m_pShooter->SetVisionLED(false);
+
+    // Extend intake.
+    m_pIntake->Extend(true);
 }
 
 /************************************************************************//**
@@ -296,6 +307,7 @@ void CRobotMain::TeleopPeriodic()
 {
 	// Create method variables.
 	static double dTrajectoryStartTime = 0.0;
+    static double dCloseRangeStartTime = 0.0;
 	static bool bHasFired           = false;
     static bool bTurretMoving       = false;
     static bool bHoodMoving         = false;
@@ -303,19 +315,38 @@ void CRobotMain::TeleopPeriodic()
     /********************************************************************
         Drive Controller - Toggle Intake (Right Bumper)
     ********************************************************************/
+    if (m_pDriveController->GetRawButtonPressed(eButtonB))
+    {
+        if (!m_pIntake->GetExtended())
+        {
+            // Extend Intake.
+            m_pIntake->Extend(true);
+            m_nTeleopState = eTeleopIntake;
+        }
+        else
+        {
+            // Retract Intake.
+            m_pIntake->Extend(false);
+            m_nTeleopState = eTeleopStopped;
+        }
+    }
+
+    /********************************************************************
+        Drive Controller - Start Intake Rollers (Right Trigger)
+    ********************************************************************/
     if (m_pDriveController->GetRawButtonPressed(eButtonRB))
     {
+        // Start intake.
         if (m_nTeleopState == eTeleopIntake)
         {
-            // Leave to idle.
             m_nTeleopState = eTeleopStopped;
         }
         else
         {
-            // Start intaking.
             m_nTeleopState = eTeleopIntake;
         }
-    }
+        
+    }    
 
 	/********************************************************************
         Drive Controller - Fire (Left Trigger)
@@ -338,35 +369,21 @@ void CRobotMain::TeleopPeriodic()
     }
 
     /********************************************************************
-        Aux Controller - Lift Robot (Right Stick)
-    ********************************************************************/
-    if (m_pAuxController->GetRawButtonPressed(eButtonRS))
-    {
-        // Toggle the lift of the robot.
-        m_pLift->ExtendLift(!m_pLift->IsExtended());
-        
-        // Check for driver safety.
-        if (!m_pLift->IsExtended())
-        {
-            // Disable driver control.
-            m_pRobotDrive->SetJoystickControl(false);
-        }
-        else
-        {
-            // Enable driver control.
-            m_pRobotDrive->SetJoystickControl(true);
-        }
-        
-    }
-
-    /********************************************************************
         Drive Controller - Close Range Fire (Left Bumper)
     ********************************************************************/
+   static bool bTimerSet = false;
     if (m_pDriveController->GetRawButton(eButtonLB))
     {
+        // Record start time.
+        if (!bTimerSet)
+        {
+            dCloseRangeStartTime = m_pTimer->Get();
+        }
         // Set state to Firing.
         m_nTeleopState = eTeleopCloseRangeFiring;
         bHasFired = true;
+        bTimerSet = true;
+
     }
     else
     {
@@ -376,6 +393,7 @@ void CRobotMain::TeleopPeriodic()
             m_pShooter->SetState(eShooterIdle);
             m_nTeleopState = eTeleopStopped;
             bHasFired = false;
+            bTimerSet = true;
         }
     }
 
@@ -388,37 +406,6 @@ void CRobotMain::TeleopPeriodic()
         m_nTeleopState = eTeleopAutoFiring;
     }
     // Other states related to this button will set state back to Idle.
-
-    /********************************************************************
-        Drive Controller - Manual Move Hood Up (Up POV)
-    ********************************************************************/
-    if (m_pDriveController->GetPOV() == 0)
-    {
-        // Manual move up.
-        m_pHood->SetState(eHoodManualFwd);
-        bHoodMoving = true;
-    }
-    else
-    {
-    /********************************************************************
-        Drive Controller - Manual Move Hood Down (Down POV)
-    ********************************************************************/
-        if (m_pDriveController->GetPOV() == 180)
-        {
-            // Manual move down.
-            m_pHood->SetState(eHoodManualRev);
-            bHoodMoving = true;
-        }
-        else
-        {
-            if (bHoodMoving)
-            {
-                // No longer moving, set to idle.
-                m_pHood->Stop();
-                bHoodMoving = false;
-            }
-        }
-    }
 
 	/********************************************************************
         Drive Controller - Move Hood to Preset Far Position (Button A)
@@ -436,14 +423,6 @@ void CRobotMain::TeleopPeriodic()
     {
         m_pHood->SetSetpoint(SmartDashboard::GetNumber("Hood Position Near", 0.0));
         m_pHood->SetState(eHoodFinding);
-    }
-
-    /********************************************************************
-        Drive Controller - Zero Hood Encoder (Button X)
-    ********************************************************************/
-    if (m_pDriveController->GetRawButtonPressed(eButtonX))
-    {
-        m_pHood->Rezero();
     }
 
 	/*************************************************************************
@@ -467,6 +446,45 @@ void CRobotMain::TeleopPeriodic()
 			m_nTeleopState = eTeleopIdle;
 		}
 	}
+
+    /********************************************************************
+        Aux Controller - Manual Move Hood Up (Up POV)
+    ********************************************************************/
+    if (m_pAuxController->GetPOV() == 0)
+    {
+        // Manual move up.
+        m_pHood->SetState(eHoodManualFwd);
+        bHoodMoving = true;
+    }
+    else
+    {
+    /********************************************************************
+        Aux Controller - Manual Move Hood Down (Down POV)
+    ********************************************************************/
+        if (m_pAuxController->GetPOV() == 180)
+        {
+            // Manual move down.
+            m_pHood->SetState(eHoodManualRev);
+            bHoodMoving = true;
+        }
+        else
+        {
+            if (bHoodMoving)
+            {
+                // No longer moving, set to idle.
+                m_pHood->Stop();
+                bHoodMoving = false;
+            }
+        }
+    }
+
+    /********************************************************************
+        Aux Controller - Zero Hood Encoder (Button X)
+    ********************************************************************/
+    if (m_pAuxController->GetRawButtonPressed(eButtonX))
+    {
+        m_pHood->Rezero();
+    }
 
     /********************************************************************
         Aux Controller - Manual Move Turret Left (Left Bumper)
@@ -521,11 +539,53 @@ void CRobotMain::TeleopPeriodic()
     }
 
     /********************************************************************
+        Aux Controller - Intake Unjam (Left Trigger)
+    ********************************************************************/
+    static bool bToggle = false;
+    if (m_pAuxController->GetRawAxis(eLeftTrigger) > 0.55)
+    {
+        // Set manual intake speed.
+        m_pIntake->SetSpeed(m_pAuxController->GetRawAxis(eLeftTrigger) - 0.5);
+        bToggle = true;
+    }
+    else
+    {
+        if (bToggle)
+        {
+            m_pIntake->SetSpeed(0.0);
+            bToggle = false;
+        }
+    }
+    
+
+    /********************************************************************
         Aux Controller - Toggle Shooter "Idle" speed (Button B)
     ********************************************************************/
     if (m_pAuxController->GetRawButtonPressed(eButtonB))
     {
         m_pShooter->SetState(m_pShooter->GetState() == eShooterIdle ? eShooterStopped : eShooterIdle);
+    }
+
+    /********************************************************************
+        Aux Controller - Lift Robot (Right Stick)
+    ********************************************************************/
+    if (m_pAuxController->GetRawButtonPressed(eButtonRS))
+    {
+        // Toggle the lift of the robot.
+        m_pLift->ExtendLift(!m_pLift->IsExtended());
+        
+        // Check for driver safety.
+        if (!m_pLift->IsExtended())
+        {
+            // Disable driver control.
+            m_pRobotDrive->SetJoystickControl(false);
+        }
+        else
+        {
+            // Enable driver control.
+            m_pRobotDrive->SetJoystickControl(true);
+        }
+        
     }
 
 	/*************************************************************************
@@ -546,8 +606,8 @@ void CRobotMain::TeleopPeriodic()
             m_pShooter->SetVisionLED(true);
             m_pTurret->SetVision(false);
             // Return intake to it's retracted state.
-            m_pIntake->Extend(false);
-            // m_pIntake->IntakeMotor(false);
+            // m_pIntake->Extend(false);
+            m_pIntake->IntakeMotor(false);
             // Enable joystick control.
             m_pRobotDrive->SetJoystickControl(true);
             // Return Lift arm to it's lower position.
@@ -570,19 +630,15 @@ void CRobotMain::TeleopPeriodic()
                 Intake - Robot is intaking Energy.
             ********************************************************************/
             // Disable LEDs
-            m_pShooter->SetVisionLED(false);
+            m_pShooter->SetVisionLED(true);
             m_pTurret->SetVision(false);
             // Return Lift arm to it's lower position.
             m_pLift->ExtendLift(false);
             // Extend intake.
             m_pIntake->Extend(true);
-            // Start intake on a half second delay.
-            if ((m_pTimer->Get() - m_dStartTime) >= 0.5)
-            {
-                // m_pIntake->IntakeMotor(true);
-            }
-            // Stop Shooter, stop Turret, and stop Hood.
-            m_pShooter->Stop();
+            // Start intake.
+            m_pIntake->IntakeMotor(true);
+            // Stop Turret, and stop Hood.
             m_pTurret->Stop();
             m_pHopper->Preload(false);
             break;
@@ -641,7 +697,7 @@ void CRobotMain::TeleopPeriodic()
             m_pTurret->SetState(eTurretIdle);
             // Set the Shooter to firing speed.
             m_pShooter->SetSetpoint(dShooterCloseRangeVelocity);
-            if (m_pShooter->IsAtSetpoint())
+            if (m_pShooter->IsAtSetpoint() && ((m_pTimer->Get() - dCloseRangeStartTime) >= 2.0))
             {
                 // Start preloading into the shooter.
                 m_pHopper->Preload(true);
@@ -729,6 +785,15 @@ void CRobotMain::DisabledInit()
 
 	// Turn off vision LED.
 	m_pShooter->SetVisionLED(true);
+
+    // Retract Intake.
+    m_pIntake->Extend(false);
+
+    // Disable music if playing.
+    if (m_pRobotDrive->GetOrchestra()->IsPlaying())
+    {
+        m_pRobotDrive->GetOrchestra()->Stop();
+    }
 }
 
 /************************************************************************//**

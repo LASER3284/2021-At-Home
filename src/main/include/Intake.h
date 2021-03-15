@@ -12,7 +12,6 @@
 
 #include <frc/Solenoid.h>
 #include <rev/CANSparkMax.h>
-#include <ctre/Phoenix.h>
 #include <frc/Timer.h>
 #include "IOMap.h"
 
@@ -20,7 +19,8 @@ using namespace frc;
 using namespace rev;
 
 // Intake Contants.
-const double dIntakeFwdSpeed	=  1.00;
+const double dIntakeFwdSpeed	=   0.60;
+const double dIntakeRevSpeed    =   0.40;
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -40,11 +40,12 @@ public:
     void Extend(bool bExtend);
     bool GetExtended();
     void IntakeMotor(bool bEnabled);
+    void SetSpeed(double dSpeed);
     double GetIntakeCurrent();
 
 private:
     // Object pointers. 
-    // WPI_TalonSRX*		m_pIntakeMotor;
+    CANSparkMax*		m_pIntakeMotor;
     Solenoid*			m_pIntakeActuator;
     frc::Timer*         m_pTimer;
 

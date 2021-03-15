@@ -7,7 +7,7 @@ Dim strComputer, varOriginalFile, objFile1, objFSO, var1, varOutFile, outfile
 Dim s, v, a, x, y, H, hh, varSplit, varFirstRun, inFolder, outFolder, oFile
 
 strComputer = "."
-inFolder = "D:\workspace\2021-At-Home-master\2021-At-Home\PathPlanner\paths\"
+inFolder = "D:\workspace\2021-At-Home\2021-At-Home\PathPlanner\paths\"
 'inFolder = "C:\PathPlanner\inpaths\"
 outFolder = "D:\workspace\2021-At-Home\2021-At-Home\src\main\deploy\paths\output\"
 'outFolder = "C:\PathPlanner\paths\"

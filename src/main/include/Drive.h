@@ -20,6 +20,7 @@
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc2/command/SwerveControllerCommand.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
+#include <ctre/phoenix/music/Orchestra.h>
 #include <AHRS.h>
 
 using namespace frc;
@@ -73,6 +74,7 @@ class CDrive
   void            FollowTrajectory(double dElapsedTime);
   double          GetYaw();
   bool            GetJoystickControl()          {  return m_bJoystickControl;  };
+  music::Orchestra* GetOrchestra()              {  return m_pOrchestra;        };
 
  private:     
   // Object pointers.     
@@ -99,6 +101,7 @@ class CDrive
   HolonomicDriveController*          m_pHolonomicDriveController;
   CTrajectoryConstants               TrajectoryConstants;
   frc2::SwerveControllerCommand<4>*  m_SwerveControllerCommand;
+  music::Orchestra*                  m_pOrchestra;
   
 
   // Member Variables.

@@ -49,7 +49,7 @@ CDrive::CDrive(frc::Joystick* pDriveController)
     // Create Odometry. Start at -1 to prevent an error.
     TrajectoryConstants.SelectTrajectory(-1);
     m_pSwerveDriveOdometry      = new SwerveDriveOdometry<4>(m_kKinematics, Rotation2d(degree_t(GetYaw())), TrajectoryConstants.GetSelectedTrajectoryStartPoint());
-     // Setup motion profile controller with PID Controllers.
+    // Setup motion profile controller with PID Controllers.
     auto m_pAnglePID = ProfiledPIDController<radian>{m_dPIDThetakP, m_dPIDThetakI, m_dPIDThetakD, TrapezoidProfile<radian>::Constraints{TrajectoryConstants.kMaxRotationSpeed, TrajectoryConstants.kMaxRotationAcceleration / 1_s}};
     m_pAnglePID.EnableContinuousInput((degree_t)-180, (degree_t)180);
     m_pHolonomicDriveController = new HolonomicDriveController( 
@@ -57,6 +57,17 @@ CDrive::CDrive(frc::Joystick* pDriveController)
         frc2::PIDController{m_dPIDYkP, m_dPIDYkI, m_dPIDYkD},
         m_pAnglePID
     );
+
+    // Add all 8 motors to an orchestra.
+    m_pOrchestra = new music::Orchestra();
+    m_pOrchestra->AddInstrument(*m_pDriveMotorFrontLeft);
+    m_pOrchestra->AddInstrument(*m_pDriveMotorFrontRight);
+    m_pOrchestra->AddInstrument(*m_pDriveMotorBackLeft);
+    m_pOrchestra->AddInstrument(*m_pDriveMotorBackRight);
+    m_pOrchestra->AddInstrument(*m_pAzimuthMotorFrontLeft);
+    m_pOrchestra->AddInstrument(*m_pAzimuthMotorFrontRight);
+    m_pOrchestra->AddInstrument(*m_pAzimuthMotorBackLeft);
+    m_pOrchestra->AddInstrument(*m_pAzimuthMotorBackRight);
 }
 
 /************************************************************************//**

@@ -21,6 +21,8 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/Compressor.h>
+
+const std::string kSong = "heart-shaped-box.chrp";
 ///////////////////////////////////////////////////////////////////////////////
 
 /************************************************************************//**

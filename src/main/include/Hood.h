@@ -35,13 +35,16 @@ const double dHoodIntegral              =  0.000600;
 const double dHoodDerivative            = 0.0000001;
 const double dHoodFeedForward           =      0.01;
 const double dHoodTolerance             =      0.25;
-const double dHoodFindingTime           =       0.0;
+const double dHoodFindingTime           =      15.0;
 const double dHoodPresetPositionFar     =     560.0;
 const double dHoodPresetPositionNear    =     150.0;
+const double dHoodHomingSpeed           =      -0.1;
+const double dHoodHomingCurrent         =      10.0;
+
 
 
 // Hood enum.
-enum HoodState 		{eHoodIdle, eHoodStopped, eHoodReset, eHoodTracking, eHoodFinding, eHoodManualFwd, eHoodManualRev};
+enum HoodState 		{eHoodIdle, eHoodStopped, eHoodReset, eHoodHoming, eHoodTracking, eHoodFinding, eHoodManualFwd, eHoodManualRev};
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -88,6 +91,7 @@ private:
     double			m_dActual;
     double			m_dMaxFindingTime;
     double			m_dFindingStartTime;
+    double          m_dHomingStartTime;
     HoodState		m_nState;
     bool			m_bIsReady;
     bool            m_bHoodSafety;
