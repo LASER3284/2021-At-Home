@@ -24,6 +24,7 @@ using namespace rev;
 // Hood Constants.
 const double dHoodMaxPosition			=    1000.0;
 const double dHoodMinPosition			=     0.000;
+const double dHoodIdlePosition          =    100.00;
 const double dHoodManualFwdSpeed 		=     0.150;
 const double dHoodManualRevSpeed		=    -0.150;
 const double dHoodOpenLoopRamp			=     0.250;

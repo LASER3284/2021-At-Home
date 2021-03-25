@@ -226,23 +226,23 @@ void CDrive::Tick()
     SmartDashboard::PutNumber("Odometry Y Pos", double(GetRobotPose().Y()));
     SmartDashboard::PutNumber("Odometry Z Pos", double(GetRobotPose().Rotation().Degrees()));
 
-    SmartDashboard::PutNumber("FrontLeft Speed", m_pModFrontLeft->GetSpeed());
-    SmartDashboard::PutNumber("FrontRight Speed", m_pModFrontRight->GetSpeed());
-    SmartDashboard::PutNumber("BackLeft Speed", m_pModBackLeft->GetSpeed());
-    SmartDashboard::PutNumber("BackRight Speed", m_pModBackRight->GetSpeed());
-    SmartDashboard::PutNumber("FrontLeft SpeedSP", m_pModFrontLeft->GetSpeedSetpoint() / 2048 * 0.391159);
-    SmartDashboard::PutNumber("FrontRight SpeedSP", m_pModFrontRight->GetSpeedSetpoint() / 2048 * 0.391159);
-    SmartDashboard::PutNumber("BackLeft SpeedSP", m_pModBackLeft->GetSpeedSetpoint() / 2048 * 0.391159);
-    SmartDashboard::PutNumber("BackRight SpeedSP", m_pModBackRight->GetSpeedSetpoint() / 2048 * 0.391159);
+    // SmartDashboard::PutNumber("FrontLeft Speed", m_pModFrontLeft->GetSpeed());
+    // SmartDashboard::PutNumber("FrontRight Speed", m_pModFrontRight->GetSpeed());
+    // SmartDashboard::PutNumber("BackLeft Speed", m_pModBackLeft->GetSpeed());
+    // SmartDashboard::PutNumber("BackRight Speed", m_pModBackRight->GetSpeed());
+    // SmartDashboard::PutNumber("FrontLeft SpeedSP", m_pModFrontLeft->GetSpeedSetpoint() / 2048 * 0.391159);
+    // SmartDashboard::PutNumber("FrontRight SpeedSP", m_pModFrontRight->GetSpeedSetpoint() / 2048 * 0.391159);
+    // SmartDashboard::PutNumber("BackLeft SpeedSP", m_pModBackLeft->GetSpeedSetpoint() / 2048 * 0.391159);
+    // SmartDashboard::PutNumber("BackRight SpeedSP", m_pModBackRight->GetSpeedSetpoint() / 2048 * 0.391159);
 
-    SmartDashboard::PutNumber("FrontLeft Angle", m_pModFrontLeft->GetAngle());
-    SmartDashboard::PutNumber("FrontRight Angle", m_pModFrontRight->GetAngle());
-    SmartDashboard::PutNumber("BackLeft Angle", m_pModBackLeft->GetAngle());
-    SmartDashboard::PutNumber("BackRight Angle", m_pModBackRight->GetAngle());
-    SmartDashboard::PutNumber("FrontLeft AngleSP", m_pModFrontLeft->GetAngleSetpoint());
-    SmartDashboard::PutNumber("FrontRight AngleSP", m_pModFrontRight->GetAngleSetpoint());
-    SmartDashboard::PutNumber("BackLeft AngleSP", m_pModBackLeft->GetAngleSetpoint());
-    SmartDashboard::PutNumber("BackRight AngleSP", m_pModBackRight->GetAngleSetpoint());
+    // SmartDashboard::PutNumber("FrontLeft Angle", m_pModFrontLeft->GetAngle());
+    // SmartDashboard::PutNumber("FrontRight Angle", m_pModFrontRight->GetAngle());
+    // SmartDashboard::PutNumber("BackLeft Angle", m_pModBackLeft->GetAngle());
+    // SmartDashboard::PutNumber("BackRight Angle", m_pModBackRight->GetAngle());
+    // SmartDashboard::PutNumber("FrontLeft AngleSP", m_pModFrontLeft->GetAngleSetpoint());
+    // SmartDashboard::PutNumber("FrontRight AngleSP", m_pModFrontRight->GetAngleSetpoint());
+    // SmartDashboard::PutNumber("BackLeft AngleSP", m_pModBackLeft->GetAngleSetpoint());
+    // SmartDashboard::PutNumber("BackRight AngleSP", m_pModBackRight->GetAngleSetpoint());
 
     // Call swerve module ticks.
     m_pModFrontLeft->Tick();

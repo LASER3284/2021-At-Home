@@ -83,7 +83,7 @@ void CShooter::Init()
     m_pLeftShooter->SetInverted(false);
     m_pRightShooter->SetInverted(true);
     // Set the peak (maximum) motor output for both controllers.
-    m_pLeftShooter->GetPIDController().SetOutputRange(-1.0, 1.0);
+    m_pLeftShooter->GetPIDController().SetOutputRange(0.0, 1.0);
     // Set the tolerances.
     SetTolerance(m_dTolerance);
     // Set the PID and feed forward values.
@@ -93,11 +93,6 @@ void CShooter::Init()
     // Set the neutral mode of the Shooter to coast.
     m_pLeftShooter->SetIdleMode(CANSparkMax::IdleMode::kCoast);
     m_pRightShooter->SetIdleMode(CANSparkMax::IdleMode::kCoast);
-    // Set the shooters to only apply power in one direction.
-    m_pLeftShooter->SetSoftLimit(CANSparkMax::SoftLimitDirection::kReverse, 0);
-    m_pRightShooter->SetSoftLimit(CANSparkMax::SoftLimitDirection::kReverse, 0);
-    m_pLeftShooter->EnableSoftLimit(CANSparkMax::SoftLimitDirection::kReverse, true);
-    m_pRightShooter->EnableSoftLimit(CANSparkMax::SoftLimitDirection::kReverse, true);
     // Set acceleration (seconds from neutral to full output).
     m_pLeftShooter->SetClosedLoopRampRate(dShooterClosedLoopRamp);
     m_pRightShooter->SetClosedLoopRampRate(dShooterClosedLoopRamp);

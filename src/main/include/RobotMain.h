@@ -22,7 +22,7 @@
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/Compressor.h>
 
-const std::string kSong = "heart-shaped-box.chrp";
+const std::string kSong = "imperial.chrp";
 ///////////////////////////////////////////////////////////////////////////////
 
 /************************************************************************//**
@@ -53,6 +53,7 @@ private:
         eTeleopStopped,
         eTeleopIdle,
         eTeleopIntake,
+        eTeleopIntake2,
         eTeleopAiming,
         eTeleopFiring,
         eTeleopCloseRangeFiring,
@@ -65,10 +66,16 @@ private:
     {
         eAutoStopped,
         eAutoIdle,
+        eAutoShoot,
+        eAutoShoot2,
+        eAutoShoot3,
+        eAutoShoot4,
         eAutoBarrelPath1,
         eAutoSlalomPath1,
         eAutoBouncePath1,
         eAutoBasicPath1,
+        eAutoGalacticSearch1,
+        eAutoGalacticSearch2,
         eAutoTestPath1,
         eSingASong
     };

@@ -28,7 +28,12 @@ enum TrajectoryList
     eBarrelPath,
     eSlalomPath,
     eBouncePath,
-    eBasicPath
+    eBasicPath,
+    eGalacticSearchRed1,
+    eGalacticSearchRed2,
+    eGalacticSearchBlue1,
+    eGalacticSearchBlue2,
+    eAutoPathReverse
 };
 /////////////////////////////////////////////////////////////////////////////
 
@@ -65,6 +70,31 @@ public:
                 m_SelectedTrajectory = TrajectoryUtil::FromPathweaverJson("/home/lvuser/deploy/paths/output/BasicPath1.wpilib.json");
                 break;
 
+            case eAutoPathReverse :
+                // Read and store the trajectory from a pre-generated JSON file.
+                m_SelectedTrajectory = TrajectoryUtil::FromPathweaverJson("/home/lvuser/deploy/paths/output/AutoReverse.wpilib.json");
+                break;
+
+            case eGalacticSearchRed1 :
+                // Read and store the trajectory from a pre-generated JSON file.
+                m_SelectedTrajectory = TrajectoryUtil::FromPathweaverJson("/home/lvuser/deploy/paths/output/Red1.wpilib.json");
+                break;
+
+            case eGalacticSearchRed2 :
+                // Read and store the trajectory from a pre-generated JSON file.
+                m_SelectedTrajectory = TrajectoryUtil::FromPathweaverJson("/home/lvuser/deploy/paths/output/Red2.wpilib.json");
+                break;
+
+            case eGalacticSearchBlue1 :
+                // Read and store the trajectory from a pre-generated JSON file.
+                m_SelectedTrajectory = TrajectoryUtil::FromPathweaverJson("/home/lvuser/deploy/paths/output/Blue1.wpilib.json");
+                break;
+
+            case eGalacticSearchBlue2 :
+                // Read and store the trajectory from a pre-generated JSON file.
+                m_SelectedTrajectory = TrajectoryUtil::FromPathweaverJson("/home/lvuser/deploy/paths/output/Blue2.wpilib.json");
+                break;
+
             default :
                 // Read and store the trajectory from a pre-generated JSON file.
                 m_SelectedTrajectory = TrajectoryUtil::FromPathweaverJson("/home/lvuser/deploy/paths/output/BasicPath1.wpilib.json");
@@ -84,9 +114,9 @@ public:
 
     // Configure trajectory properties.
     const meters_per_second_t kMaxTranslationSpeed = 4.0_mps;
-    const meters_per_second_squared_t kMaxTranslationAcceleration = 3_mps_sq;
+    const meters_per_second_squared_t kMaxTranslationAcceleration = 3.5_mps_sq;
     const radians_per_second_t kMaxRotationSpeed = 3.0_rad_per_s;
-    const radians_per_second_t kMaxRotationAcceleration = 4.0_rad_per_s;
+    const radians_per_second_t kMaxRotationAcceleration = 3.0_rad_per_s;
 
     // Preset Teleop Trajectory.
     vector<Pose2d> PresetWaypoints
