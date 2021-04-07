@@ -332,7 +332,7 @@ void CHood::SetSetpoint(double dSetpoint)
     else
     {
         // Don't drive the hood all the way to min pos if we are far away from it.
-        if (dHoodMinPosition + dSetpoint <= 30)
+        if ((dHoodMinPosition + dSetpoint <= 30) && m_bHoodSafety)
         {
             m_dSetpoint = dHoodIdlePosition;
         }

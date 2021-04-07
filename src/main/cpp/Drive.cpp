@@ -198,7 +198,7 @@ void CDrive::Tick()
         }
         
         // Check joystick for deadzones. If it is below the deadzone threshold, set to 0.
-        m_dRotateCW = m_pDriveController->GetRawAxis(4);
+        m_dRotateCW = m_pDriveController->GetRawAxis(4) * 0.4;
         if (fabs(m_dRotateCW) < m_dJoystickDeadzone)
         {
             m_dRotateCW = 0.0;

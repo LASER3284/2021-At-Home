@@ -40,6 +40,7 @@ public:
     void Extend(bool bExtend);
     bool GetExtended();
     void IntakeMotor(bool bEnabled);
+    bool GetIntakeMotorEnabled();
     void SetSpeed(double dSpeed);
     double GetIntakeCurrent();
 
@@ -50,6 +51,7 @@ private:
     frc::Timer*         m_pTimer;
 
     // Declare variables.
+    bool m_bIntakeEnabled;
 };
 /////////////////////////////////////////////////////////////////////////////
 #endif

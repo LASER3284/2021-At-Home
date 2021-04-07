@@ -97,9 +97,11 @@ void CRobotMain::RobotInit()
 	m_pAutonomousChooser->AddOption("Slalom Path", "Slalom Path");
 	m_pAutonomousChooser->AddOption("Bounce Path", "Bounce Path");
 	m_pAutonomousChooser->AddOption("Basic Path", "Basic Path");
+    m_pAutonomousChooser->AddOption("Galactic Search", "Galactic Search");
     m_pAutonomousChooser->AddOption("Test Path", "Test Path");
 	m_pAutonomousChooser->AddOption("Just Sing a Song", "Just Sing a Song");
 	SmartDashboard::PutData(m_pAutonomousChooser);
+    SmartDashboard::PutNumber("Y Setpoint Offset", 0.0);
 
 	// Start the robot timer.
 	m_pTimer->Start();
@@ -161,6 +163,10 @@ void CRobotMain::AutonomousInit()
 		m_nAutoState = eAutoBouncePath1;
 		m_nSelectedTrajectory = eBouncePath;
 	}
+    if (m_strAutonomousSelected == "Galactic Search")
+    {
+        m_nAutoState = eAutoGalacticSearch1;
+    }
 	if (m_strAutonomousSelected == "Basic Path")
 	{
 		m_nAutoState = eAutoBasicPath1;
@@ -199,16 +205,17 @@ void CRobotMain::AutonomousPeriodic()
     double dBallXLocation = SmartDashboard::GetNumber("Target Center X", 0.0);
     double dBallRadius = SmartDashboard::GetNumber("Target Radius", 0.0);
     // Create instance variables.
-    double dRed1BallExpectedLocation    = 0.0;          //  
-    double dRed1BallExpectedRadius      = 0.0;          //  
-    double dRed2BallExpectedLocation    = 0.0;          //  
-    double dRed2BallExpectedRadius      = 0.0;          //  ----| These are the values for the closest ball on each path. 
-    double dBlue1BallExpectedLocation   = 0.0;          //  
-    double dBlue1BallExpectedRadius     = 0.0;          //  
-    double dBlue2BallExpectedLocation   = 0.0;          //  
-    double dBlue2BallExpectedRadius     = 0.0;          //
-    double dBallLocationTolerance       = 0.0;  
-    double dBallRadiusTolerance         = 0.0; 
+    double dRed1BallExpectedLocation    = 140.0;          //  
+    double dRed1BallExpectedRadius      = 52.0;          //  
+    double dRed2BallExpectedLocation    = -287.0;          //  
+    double dRed2BallExpectedRadius      = 33.0;          //  ----| These are the values for the closest ball on each path. 
+    double dBlue1BallExpectedLocation   = -59.0;          //  
+    double dBlue1BallExpectedRadius     = 14.0;          //  
+    double dBlue2BallExpectedLocation   = 217.0;          //  
+    double dBlue2BallExpectedRadius     = 18.0;          //
+    double dBallLocationTolerance       = 20.0;  
+    double dBallRadiusTolerance         = 20.0; 
+    bool bGalacticSearchPathFound       = false;
 
 	// Autonomous state machine.
 	switch (m_nAutoState)
@@ -216,6 +223,19 @@ void CRobotMain::AutonomousPeriodic()
 		case eAutoStopped :
 			// Do stopping things here.
 			m_pRobotDrive->Stop();
+            // Disable LEDs
+            m_pShooter->SetVisionLED(true);
+            m_pTurret->SetVision(false);
+            // Return intake to it's retracted state.
+            m_pIntake->Extend(false);
+            m_pIntake->IntakeMotor(false);
+            // Return Lift arm to it's lower position.
+            m_pLift->ExtendLift(false);
+            // Idle the Hood, Turret, and Hopper.
+            m_pHood->SetState(eHoodReset);
+            // m_pTurret->Stop();
+            m_pHopper->Preload(false);
+
 			// Move to auto idle state.
 			m_nAutoState = eAutoIdle;
 
@@ -244,7 +264,7 @@ void CRobotMain::AutonomousPeriodic()
                 // Enable LEDs.
                 m_pShooter->SetVisionLED(true);
                 // Aim with vision.
-                m_pHood->SetSetpoint(SmartDashboard::GetNumber("Target Distance", 0));
+                m_pHood->SetSetpoint(SmartDashboard::GetNumber("Target Distance", 0) + SmartDashboard::GetNumber("Y Setpoint Offset", 0));
                 // Set firing velocity.
                 m_pShooter->SetSetpoint(dShooterFiringVelocity);
                 // Start shooting when ready.
@@ -337,46 +357,63 @@ void CRobotMain::AutonomousPeriodic()
 			break;
 
         case eAutoGalacticSearch1 :
-            // Select red/blue a/b path based on power cell location.
-            // Red 1 path.
-            if ((fabs(dBallXLocation - dRed1BallExpectedLocation) < dBallLocationTolerance) && (fabs(dBallRadius - dRed1BallExpectedRadius) < dBallRadiusTolerance))
+            // Set vision to power cell tracking mode.
+            SmartDashboard::PutBoolean("Camera Source", true);
+
+            // Wait 1 sec for vision to adjust.
+            if ((m_pTimer->Get() - m_dStartTime) > 0.2)
             {
-                // Select path.
-                m_pRobotDrive->SetSelectedTrajectory(eGalacticSearchRed1);
-
-                // Put selected state on dashboard for debugging.
-                SmartDashboard::PutString("Galactic Search Path", "Red 1");
+                // Select red/blue a/b path based on power cell location.
+                // Red 1 path.
+                if ((fabs(dBallXLocation - dRed1BallExpectedLocation) < dBallLocationTolerance) && (fabs(dBallRadius - dRed1BallExpectedRadius) < dBallRadiusTolerance))
+                {
+                    // Select path.
+                    m_pRobotDrive->SetSelectedTrajectory(eGalacticSearchRed1);
+                    // Put selected state on dashboard for debugging.
+                    SmartDashboard::PutString("Galactic Search Path", "Red 1");
+                    // Set that a path was selected.
+                    bGalacticSearchPathFound = true;
+                }
+                // Red 2 path.
+                if ((fabs(dBallXLocation - dRed2BallExpectedLocation) < dBallLocationTolerance) && (fabs(dBallRadius - dRed2BallExpectedRadius) < dBallRadiusTolerance))
+                {
+                    // Select path.
+                    m_pRobotDrive->SetSelectedTrajectory(eGalacticSearchRed2);
+                    // Put selected state on dashboard for debugging.
+                    SmartDashboard::PutString("Galactic Search Path", "Red 2");
+                    // Set that a path was selected.
+                    bGalacticSearchPathFound = true;
+                }
+                // Blue 1 path.
+                if ((fabs(dBallXLocation - dBlue1BallExpectedLocation) < dBallLocationTolerance) && (fabs(dBallRadius - dBlue1BallExpectedRadius) < dBallRadiusTolerance))
+                {
+                    // Select path.
+                    m_pRobotDrive->SetSelectedTrajectory(eGalacticSearchBlue1);
+                    // Put selected state on dashboard for debugging.
+                    SmartDashboard::PutString("Galactic Search Path", "Blue 1");
+                    // Set that a path was selected.
+                    bGalacticSearchPathFound = true;
+                }
+                // Blue 2 path.
+                if ((fabs(dBallXLocation - dBlue2BallExpectedLocation) < dBallLocationTolerance) && (fabs(dBallRadius - dBlue2BallExpectedRadius) < dBallRadiusTolerance))
+                {
+                    // Select path.
+                    m_pRobotDrive->SetSelectedTrajectory(eGalacticSearchBlue2);
+                    // Put selected state on dashboard for debugging.
+                    SmartDashboard::PutString("Galactic Search Path", "Blue 2");
+                    // Set that a path was selected.
+                    bGalacticSearchPathFound = true;
+                }
             }
-            // Red 2 path.
-            if ((fabs(dBallXLocation - dRed2BallExpectedLocation) < dBallLocationTolerance) && (fabs(dBallRadius - dRed2BallExpectedRadius) < dBallRadiusTolerance))
+
+            // Move to the next state when a path is selected.
+            if (bGalacticSearchPathFound)
             {
-                // Select path.
-                m_pRobotDrive->SetSelectedTrajectory(eGalacticSearchRed2);
-
-                // Put selected state on dashboard for debugging.
-                SmartDashboard::PutString("Galactic Search Path", "Red 2");
+                // Move auto states.
+                m_nAutoState = eAutoGalacticSearch2;
+                // Record new start time.
+                m_dStartTime = m_pTimer->Get();
             }
-            // Blue 1 path.
-            if ((fabs(dBallXLocation - dBlue1BallExpectedLocation) < dBallLocationTolerance) && (fabs(dBallRadius - dBlue1BallExpectedRadius) < dBallRadiusTolerance))
-            {
-                // Select path.
-                m_pRobotDrive->SetSelectedTrajectory(eGalacticSearchBlue1);
-
-                // Put selected state on dashboard for debugging.
-                SmartDashboard::PutString("Galactic Search Path", "Blue 1");
-            }
-            // Blue 2 path.
-            if ((fabs(dBallXLocation - dBlue2BallExpectedLocation) < dBallLocationTolerance) && (fabs(dBallRadius - dBlue2BallExpectedRadius) < dBallRadiusTolerance))
-            {
-                // Select path.
-                m_pRobotDrive->SetSelectedTrajectory(eGalacticSearchBlue2);
-
-                // Put selected state on dashboard for debugging.
-                SmartDashboard::PutString("Galactic Search Path", "Blue 2");
-            }
-
-            // Move to the next state.
-            m_nAutoState = eAutoGalacticSearch2;
             break;
 
         case eAutoGalacticSearch2 :
@@ -389,17 +426,13 @@ void CRobotMain::AutonomousPeriodic()
             m_pShooter->SetVisionLED(false);
             // Stop turret.
             m_pTurret->SetVision(false);
-            // Set idle.
-            m_pShooter->SetSetpoint(eShooterStopped);
             // Follow path.
             m_pRobotDrive->FollowTrajectory(dElapsedTime);
             // Check time.
             if (dElapsedTime > m_pRobotDrive->GetTrajectoryTotalTime())
             {
-                // Stop robot drive.
-                m_pRobotDrive->Stop();
                 // Move to next state.
-                m_nAutoState = eAutoIdle;
+                m_nAutoState = eAutoStopped;
             }
             break;
 
@@ -471,7 +504,7 @@ void CRobotMain::TeleopPeriodic()
     static bool bHoodMoving         = false;
 
     /********************************************************************
-        Drive Controller - Toggle Intake (Right Bumper)
+        Drive Controller - Toggle Intake (Button B)
     ********************************************************************/
     if (m_pDriveController->GetRawButtonPressed(eButtonB))
     {
@@ -490,12 +523,12 @@ void CRobotMain::TeleopPeriodic()
     }
 
     /********************************************************************
-        Drive Controller - Start Intake Rollers (Right Trigger)
+        Drive Controller - Start Intake Rollers (Right Bumper)
     ********************************************************************/
     if (m_pDriveController->GetRawButtonPressed(eButtonRB))
     {
         // Start intake.
-        if (m_nTeleopState == eTeleopIntake)
+        if (m_nTeleopState == eTeleopIntake2)
         {
             m_nTeleopState = eTeleopStopped;
         }
@@ -529,31 +562,31 @@ void CRobotMain::TeleopPeriodic()
     /********************************************************************
         Drive Controller - Close Range Fire (Left Bumper)
     ********************************************************************/
-//    static bool bTimerSet = false;
-//     if (m_pDriveController->GetRawButton(eButtonLB))
-//     {
-//         // Record start time.
-//         if (!bTimerSet)
-//         {
-//             dCloseRangeStartTime = m_pTimer->Get();
-//         }
-//         // Set state to Firing.
-//         m_nTeleopState = eTeleopCloseRangeFiring;
-//         bHasFired = true;
-//         bTimerSet = true;
+   static bool bTimerSet = false;
+    if (m_pDriveController->GetRawButton(eButtonLB))
+    {
+        // Record start time.
+        if (!bTimerSet)
+        {
+            dCloseRangeStartTime = m_pTimer->Get();
+        }
+        // Set state to Firing.
+        m_nTeleopState = eTeleopCloseRangeFiring;
+        bHasFired = true;
+        bTimerSet = true;
 
-//     }
-//     else
-//     {
-//         if (bHasFired)
-//         {
-//             // Has been fired, return to idle.
-//             m_pShooter->SetState(eShooterIdle);
-//             m_nTeleopState = eTeleopStopped;
-//             bHasFired = false;
-//             bTimerSet = true;
-//         }
-//     }
+    }
+    else
+    {
+        if (bHasFired)
+        {
+            // Has been fired, return to idle.
+            m_pShooter->SetState(eShooterIdle);
+            m_nTeleopState = eTeleopStopped;
+            bHasFired = false;
+            bTimerSet = true;
+        }
+    }
 
     /********************************************************************
         Drive Controller - AutoFire (Right Trigger + Aux Right Trigger)
@@ -774,6 +807,7 @@ void CRobotMain::TeleopPeriodic()
             m_pHood->SetState(eHoodReset);
             // m_pTurret->Stop();
             m_pHopper->Preload(false);
+            m_pHood->SetHoodSafety(true);
 
 			// Move to teleop idle.
 			m_nTeleopState = eTeleopIdle;
@@ -834,7 +868,7 @@ void CRobotMain::TeleopPeriodic()
             // Stop Preloader.
             m_pHopper->Preload(false);
             // Set the Hood to tracking mode.
-            m_pHood->SetSetpoint(SmartDashboard::GetNumber("Target Distance", 0.0));
+            m_pHood->SetSetpoint(SmartDashboard::GetNumber("Target Distance", 0.0) + SmartDashboard::GetNumber("Y Setpoint Offset", 0));
             break;
         
         case eTeleopFiring :
@@ -865,14 +899,18 @@ void CRobotMain::TeleopPeriodic()
             m_pRobotDrive->SetJoystickControl(false);
             // Lift the front of the robot.
             m_pLift->ExtendLift(true);
-            // Don't vision track.
-            m_pShooter->SetVisionLED(false);
-            m_pTurret->SetVision(false);
+            // *Do* vision track.
+            m_pShooter->SetVisionLED(true);
+            m_pTurret->SetVision(true);
             // Set the Turret to idle, we don't want it to move.
-            m_pTurret->SetState(eTurretIdle);
+            m_pTurret->SetState(eTurretTracking);
             // Set the Shooter to firing speed.
             m_pShooter->SetSetpoint(dShooterCloseRangeVelocity);
-            if (m_pShooter->IsAtSetpoint() && ((m_pTimer->Get() - dCloseRangeStartTime) >= 2.0))
+            // Set the hood to zero.
+            m_pHood->SetSetpoint(1.0);
+            // Turn off hood safety.
+            m_pHood->SetHoodSafety(false);
+            if (m_pShooter->IsAtSetpoint() && ((m_pTimer->Get() - dCloseRangeStartTime) >= 3.5))
             {
                 // Start preloading into the shooter.
                 m_pHopper->Preload(true);

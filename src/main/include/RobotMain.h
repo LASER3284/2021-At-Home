@@ -22,7 +22,7 @@
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/Compressor.h>
 
-const std::string kSong = "imperial.chrp";
+const std::string kSong = "heart-shaped-box.chrp";
 ///////////////////////////////////////////////////////////////////////////////
 
 /************************************************************************//**

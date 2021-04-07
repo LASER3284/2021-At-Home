@@ -25,6 +25,9 @@ CIntake::CIntake()
     m_pIntakeMotor		= new CANSparkMax(nIntakeMotor, CANSparkMax::MotorType::kBrushless);
     m_pIntakeActuator	= new Solenoid(nIntakeSolenoid);
     m_pTimer            = new Timer();
+
+    // Initialize member variables.
+    m_bIntakeEnabled    = false;
 }
 
 /****************************************************************************
@@ -90,12 +93,24 @@ void CIntake::IntakeMotor(bool bStartIntake)
     if (bStartIntake)
     {
         m_pIntakeMotor->Set(dIntakeFwdSpeed);
+        m_bIntakeEnabled = true;
     }
     else
     {
         m_pIntakeMotor->Set(0.0);
+        m_bIntakeEnabled = false;
     }
     
+}
+
+/****************************************************************************
+    Description:	Returns if the intake is enabled.
+    Arguments:		None
+    Returns:		bool - bEnabled
+****************************************************************************/
+bool CIntake::GetIntakeMotorEnabled()
+{
+    return m_bIntakeEnabled;
 }
 
 /****************************************************************************
