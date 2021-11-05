@@ -1,11 +1,11 @@
 /****************************************************************************  
- *	Implements the SwerveModule class.
- *
- *	Classes:		CSwerveModule
- *
- *	Project:		Swerve Drive
- *
- * 	Copyright © 2021 FIRST Team 3284 - Camdenton LASER Robotics.
+ 	Implements the SwerveModule class.
+ 
+ 	Classes:		CSwerveModule
+ 
+ 	Project:		2021 Infinite Recharge At-Home Robot Code.
+ 
+  	Copyright © 2021 FIRST Team 3284 - Camdenton LASER Robotics.
  ***************************************************************************/
 #include "SwerveModule.h"
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -67,6 +67,7 @@ void CSwerveModule::Init()
 {
     // Make sure PID input is expecting -180/180.
     m_pDriveMotor->ConfigSelectedFeedbackSensor(motorcontrol::FeedbackDevice::IntegratedSensor);
+    m_pDriveMotor->SetNeutralMode(motorcontrol::NeutralMode::Brake);
     m_pDriveMotor->Config_kF(0, m_dDriveFeedForward);
     m_pDriveMotor->Config_kP(0, m_dDriveProportional);
     m_pDriveMotor->Config_kI(0, m_dDriveIntegral);
@@ -76,6 +77,7 @@ void CSwerveModule::Init()
     m_pAnglePIDController->SetTolerance(1);
     m_pAzimuthMotor->SetNeutralMode(motorcontrol::NeutralMode::Brake);
     m_pAzimuthMotor->ConfigNeutralDeadband(m_dMotorDeadband);
+    m_pAzimuthMotor->SetIntegralAccumulator(0);
     m_pEncoder->SetPositionToAbsolute();
     m_pEncoder->ConfigAbsoluteSensorRange(ctre::phoenix::sensors::AbsoluteSensorRange::Signed_PlusMinus180);
     m_pEncoder->ConfigSensorInitializationStrategy(sensors::SensorInitializationStrategy::BootToAbsolutePosition);

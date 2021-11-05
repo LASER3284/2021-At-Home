@@ -3,7 +3,9 @@
 
 	Classes:		CDrive
 
-	Project:		Swerve Drive
+	Project:		2021 Infinite Recharge At-Home Robot Code.
+
+    Copyright © 2021 FIRST Team 3284 - Camdenton LASER Robotics.
 ****************************************************************************/
 #include "Drive.h"
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -38,21 +40,34 @@ CDrive::CDrive(frc::Joystick* pDriveController)
     m_pEncoderBackLeft          = new sensors::CANCoder(nEncoderBackLeft);
     m_pEncoderBackRight         = new sensors::CANCoder(nEncoderBackRight);
     // Create our 4 swerve modules.
-    m_pModFrontLeft             = new CSwerveModule(m_pDriveMotorFrontLeft, m_pAzimuthMotorFrontLeft, m_pEncoderFrontLeft, 0);
-    m_pModFrontRight            = new CSwerveModule(m_pDriveMotorFrontRight, m_pAzimuthMotorFrontRight, m_pEncoderFrontRight, 0);
-    m_pModBackLeft              = new CSwerveModule(m_pDriveMotorBackLeft, m_pAzimuthMotorBackLeft, m_pEncoderBackLeft, 0);
-    m_pModBackRight             = new CSwerveModule(m_pDriveMotorBackRight, m_pAzimuthMotorBackRight, m_pEncoderBackRight, 0);
+    m_pModFrontLeft             = new CSwerveModule(m_pDriveMotorFrontLeft, m_pAzimuthMotorFrontLeft, m_pEncoderFrontLeft, 65);
+    m_pModFrontRight            = new CSwerveModule(m_pDriveMotorFrontRight, m_pAzimuthMotorFrontRight, m_pEncoderFrontRight, -150);
+    m_pModBackLeft              = new CSwerveModule(m_pDriveMotorBackLeft, m_pAzimuthMotorBackLeft, m_pEncoderBackLeft, -113);
+    m_pModBackRight             = new CSwerveModule(m_pDriveMotorBackRight, m_pAzimuthMotorBackRight, m_pEncoderBackRight, -161);
     // Create the NavX Gyro.
     m_pGyro                     = new AHRS(SerialPort::Port::kUSB);
     // Create Odometry. Start at -1 to prevent an error.
     TrajectoryConstants.SelectTrajectory(-1);
     m_pSwerveDriveOdometry      = new SwerveDriveOdometry<4>(m_kKinematics, Rotation2d(degree_t(GetYaw())), TrajectoryConstants.GetSelectedTrajectoryStartPoint());
     // Setup motion profile controller with PID Controllers.
+    auto m_pAnglePID = ProfiledPIDController<radian>{m_dPIDThetakP, m_dPIDThetakI, m_dPIDThetakD, TrapezoidProfile<radian>::Constraints{TrajectoryConstants.kMaxRotationSpeed, TrajectoryConstants.kMaxRotationAcceleration / 1_s}};
+    m_pAnglePID.EnableContinuousInput((degree_t)-180, (degree_t)180);
     m_pHolonomicDriveController = new HolonomicDriveController( 
         frc2::PIDController{m_dPIDXkP, m_dPIDXkI, m_dPIDXkD}, 
         frc2::PIDController{m_dPIDYkP, m_dPIDYkI, m_dPIDYkD},
-        ProfiledPIDController<radian>{m_dPIDThetakP, m_dPIDThetakI, m_dPIDThetakD, TrapezoidProfile<radian>::Constraints{TrajectoryConstants.kMaxRotationSpeed, TrajectoryConstants.kMaxRotationAcceleration / 1_s}}
+        m_pAnglePID
     );
+
+    // Add all 8 motors to an orchestra.
+    m_pOrchestra = new music::Orchestra();
+    m_pOrchestra->AddInstrument(*m_pDriveMotorFrontLeft);
+    m_pOrchestra->AddInstrument(*m_pDriveMotorFrontRight);
+    m_pOrchestra->AddInstrument(*m_pDriveMotorBackLeft);
+    m_pOrchestra->AddInstrument(*m_pDriveMotorBackRight);
+    m_pOrchestra->AddInstrument(*m_pAzimuthMotorFrontLeft);
+    m_pOrchestra->AddInstrument(*m_pAzimuthMotorFrontRight);
+    m_pOrchestra->AddInstrument(*m_pAzimuthMotorBackLeft);
+    m_pOrchestra->AddInstrument(*m_pAzimuthMotorBackRight);
 }
 
 /************************************************************************//**
@@ -157,9 +172,9 @@ void CDrive::Init()
 void CDrive::Tick()
 {
     if (m_bJoystickControl)
-    {
+    {   
         // Check joystick for deadzones. If it is below the deadzone threshold, set to 0.
-        m_dYAxis = m_pDriveController->GetRawAxis(1);
+        m_dYAxis = m_pDriveController->GetRawAxis(1) * ((m_pDriveController->GetRawAxis(eRightTrigger) + 0.5) / 1.5);
         if (fabs(m_dYAxis) < m_dJoystickDeadzone)
         {
             m_dYAxis = 0.0;
@@ -171,7 +186,7 @@ void CDrive::Tick()
         }
         
         // Check joystick for deadzones. If it is below the deadzone threshold, set to 0.
-        m_dXAxis = m_pDriveController->GetRawAxis(0);
+        m_dXAxis = m_pDriveController->GetRawAxis(0) * ((m_pDriveController->GetRawAxis(eRightTrigger) + 0.5) / 1.5);
         if (fabs(m_dXAxis) < m_dJoystickDeadzone)
         {
             m_dXAxis = 0.0;
@@ -183,7 +198,7 @@ void CDrive::Tick()
         }
         
         // Check joystick for deadzones. If it is below the deadzone threshold, set to 0.
-        m_dRotateCW = m_pDriveController->GetRawAxis(4);
+        m_dRotateCW = m_pDriveController->GetRawAxis(4) * 0.4;
         if (fabs(m_dRotateCW) < m_dJoystickDeadzone)
         {
             m_dRotateCW = 0.0;
@@ -211,24 +226,23 @@ void CDrive::Tick()
     SmartDashboard::PutNumber("Odometry Y Pos", double(GetRobotPose().Y()));
     SmartDashboard::PutNumber("Odometry Z Pos", double(GetRobotPose().Rotation().Degrees()));
 
-    SmartDashboard::PutNumber("FrontLeft Speed", m_pModFrontLeft->GetSpeed());
-    SmartDashboard::PutNumber("FrontRight Speed", m_pModFrontRight->GetSpeed());
-    SmartDashboard::PutNumber("BackLeft Speed", m_pModBackLeft->GetSpeed());
-    SmartDashboard::PutNumber("BackRight Speed", m_pModBackRight->GetSpeed());
-    SmartDashboard::PutNumber("FrontLeft SpeedSP", m_pModFrontLeft->GetSpeedSetpoint() / 2048 * 0.391159);
-    SmartDashboard::PutNumber("FrontRight SpeedSP", m_pModFrontRight->GetSpeedSetpoint() / 2048 * 0.391159);
-    SmartDashboard::PutNumber("BackLeft SpeedSP", m_pModBackLeft->GetSpeedSetpoint() / 2048 * 0.391159);
-    SmartDashboard::PutNumber("BackRight SpeedSP", m_pModBackRight->GetSpeedSetpoint() / 2048 * 0.391159
-    );
+    // SmartDashboard::PutNumber("FrontLeft Speed", m_pModFrontLeft->GetSpeed());
+    // SmartDashboard::PutNumber("FrontRight Speed", m_pModFrontRight->GetSpeed());
+    // SmartDashboard::PutNumber("BackLeft Speed", m_pModBackLeft->GetSpeed());
+    // SmartDashboard::PutNumber("BackRight Speed", m_pModBackRight->GetSpeed());
+    // SmartDashboard::PutNumber("FrontLeft SpeedSP", m_pModFrontLeft->GetSpeedSetpoint() / 2048 * 0.391159);
+    // SmartDashboard::PutNumber("FrontRight SpeedSP", m_pModFrontRight->GetSpeedSetpoint() / 2048 * 0.391159);
+    // SmartDashboard::PutNumber("BackLeft SpeedSP", m_pModBackLeft->GetSpeedSetpoint() / 2048 * 0.391159);
+    // SmartDashboard::PutNumber("BackRight SpeedSP", m_pModBackRight->GetSpeedSetpoint() / 2048 * 0.391159);
 
-    SmartDashboard::PutNumber("FrontLeft Angle", m_pModFrontLeft->GetAngle());
-    SmartDashboard::PutNumber("FrontRight Angle", m_pModFrontRight->GetAngle());
-    SmartDashboard::PutNumber("BackLeft Angle", m_pModBackLeft->GetAngle());
-    SmartDashboard::PutNumber("BackRight Angle", m_pModBackRight->GetAngle());
-    SmartDashboard::PutNumber("FrontLeft AngleSP", m_pModFrontLeft->GetAngleSetpoint());
-    SmartDashboard::PutNumber("FrontRight AngleSP", m_pModFrontRight->GetAngleSetpoint());
-    SmartDashboard::PutNumber("BackLeft AngleSP", m_pModBackLeft->GetAngleSetpoint());
-    SmartDashboard::PutNumber("BackRight AngleSP", m_pModBackRight->GetAngleSetpoint());
+    // SmartDashboard::PutNumber("FrontLeft Angle", m_pModFrontLeft->GetAngle());
+    // SmartDashboard::PutNumber("FrontRight Angle", m_pModFrontRight->GetAngle());
+    // SmartDashboard::PutNumber("BackLeft Angle", m_pModBackLeft->GetAngle());
+    // SmartDashboard::PutNumber("BackRight Angle", m_pModBackRight->GetAngle());
+    // SmartDashboard::PutNumber("FrontLeft AngleSP", m_pModFrontLeft->GetAngleSetpoint());
+    // SmartDashboard::PutNumber("FrontRight AngleSP", m_pModFrontRight->GetAngleSetpoint());
+    // SmartDashboard::PutNumber("BackLeft AngleSP", m_pModBackLeft->GetAngleSetpoint());
+    // SmartDashboard::PutNumber("BackRight AngleSP", m_pModBackRight->GetAngleSetpoint());
 
     // Call swerve module ticks.
     m_pModFrontLeft->Tick();
@@ -379,11 +393,11 @@ void CDrive::FollowTrajectory(double dElapsedTime)
 {
     // Sample the trajectory at the given time.
     auto Goal = TrajectoryConstants.GetSelectedTrajectory().Sample(second_t(dElapsedTime));
-    degree_t dDesiredTheta = degree_t(0); //Goal.pose.Rotation().Degrees();
+    double dDesiredTheta = (Goal.curvature() * (180 / 3.1415926));
     SmartDashboard::PutNumber("Desired Theta", double(dDesiredTheta));
 
     // Calculate the module states based on current position.
-    auto AdjustedSpeeds = m_pHolonomicDriveController->Calculate(GetRobotPose(), Goal, dDesiredTheta);
+    auto AdjustedSpeeds = m_pHolonomicDriveController->Calculate(GetRobotPose(), Goal, degree_t(dDesiredTheta));
 
     SmartDashboard::PutNumber("Wheel SPEEDX", double(AdjustedSpeeds.vx));
     SmartDashboard::PutNumber("Wheel SPEEDY", double(AdjustedSpeeds.vy));

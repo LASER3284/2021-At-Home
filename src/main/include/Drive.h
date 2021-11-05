@@ -3,7 +3,9 @@
  *  
  *  Classes:		CDrive
  *  
- *  Project:		Swerve Drive
+ *  Project:		2021 Infinite Recharge At-Home Robot Code.
+ * 
+ *  Copyright © 2021 FIRST Team 3284 - Camdenton LASER Robotics.
 ****************************************************************************/
 #pragma once
 
@@ -18,6 +20,7 @@
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc2/command/SwerveControllerCommand.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
+#include <ctre/phoenix/music/Orchestra.h>
 #include <AHRS.h>
 
 using namespace frc;
@@ -25,20 +28,20 @@ using namespace frc2;
 using namespace ctre::phoenix;
 using namespace units;
 
-const double m_dJoystickDeadzone  = 0.12;
-const double m_dTeleopMultiplier  = 3.0;
+const double m_dJoystickDeadzone  = 0.1;
+const double m_dTeleopMultiplier  = 4.0;
 // PID gains for the X translation.
-const double m_dPIDXkP            = 0.05;
-const double m_dPIDXkI            = 0.00;
-const double m_dPIDXkD            = 0.00;
+const double m_dPIDXkP            = 2.6;
+const double m_dPIDXkI            = 0.0;
+const double m_dPIDXkD            = 0.2;
 // PID gains for the Y translation
-const double m_dPIDYkP            = 0.05;
-const double m_dPIDYkI            = 0.00;
-const double m_dPIDYkD            = 0.00;
+const double m_dPIDYkP            = 2.6;
+const double m_dPIDYkI            = 0.0;
+const double m_dPIDYkD            = 0.2;
 // PID gains for the Theta rotation.
-const double m_dPIDThetakP        = 0.5;
-const double m_dPIDThetakI        = 0.00;
-const double m_dPIDThetakD        = 0.00;
+const double m_dPIDThetakP        = 4.9;
+const double m_dPIDThetakI        = 0.0;
+const double m_dPIDThetakD        = 0.3;
 // Setup the swerve kinematics.
 const Translation2d FrontLeft                      = Translation2d((inch_t)(dWidth / 2), (inch_t)(dLength / 2));
 const Translation2d FrontRight                     = Translation2d((inch_t)(dWidth / 2), (inch_t)(-dLength / 2));
@@ -70,6 +73,8 @@ class CDrive
   void            GenerateTrajectoryFromCurrentPosition();
   void            FollowTrajectory(double dElapsedTime);
   double          GetYaw();
+  bool            GetJoystickControl()          {  return m_bJoystickControl;  };
+  music::Orchestra* GetOrchestra()              {  return m_pOrchestra;        };
 
  private:     
   // Object pointers.     
@@ -96,6 +101,7 @@ class CDrive
   HolonomicDriveController*          m_pHolonomicDriveController;
   CTrajectoryConstants               TrajectoryConstants;
   frc2::SwerveControllerCommand<4>*  m_SwerveControllerCommand;
+  music::Orchestra*                  m_pOrchestra;
   
 
   // Member Variables.

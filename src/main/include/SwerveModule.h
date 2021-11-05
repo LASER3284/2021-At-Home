@@ -3,7 +3,7 @@
  *  
  *  Classes:		    CSwerveModule
  *  
- *  Project:		    Swerve Drive
+ *  Project:		    2021 Infinite Recharge At-Home Robot Code.
  * 
  * 	Copyright © 2021 FIRST Team 3284 - Camdenton LASER Robotics.
  ****************************************************************************/
@@ -18,16 +18,16 @@
 using namespace ctre::phoenix;
 
 const int    m_dEncoderTicksPerRev  = 2048;
-const double m_dEncoderConvert      = ((1 / (8.16)) * 10) * (3.1415926  * (4 * 0.0254));
-const double m_dDriveProportional   = 0.0013;
-const double m_dDriveIntegral       = 0.0000;
-const double m_dDriveDerivative     = 0.0001;
-const double m_dDriveFeedForward    = 0.0466;
-const double m_dAngleProportional   = 0.0064;
-const double m_dAngleIntegral       = 0.0000;
-const double m_dAngleDerivative     = 0.0100; // This might do something. 
+const double m_dEncoderConvert      = ((1 / (8.16)) * 10) * (3.1415926  * (3.9 * 0.0254));
+const double m_dDriveProportional   = 0.002;
+const double m_dDriveIntegral       = 0.000;
+const double m_dDriveDerivative     = 0.000;
+const double m_dDriveFeedForward    = 0.049;
+const double m_dAngleProportional   = 0.0073;
+const double m_dAngleIntegral       = 0.0048;
+const double m_dAngleDerivative     = 0.000; // This might do something. 
 const double m_dAngleTolerance      = 1.0000;
-const double m_dMotorDeadband       = 0.0300;
+const double m_dMotorDeadband       = 0.000;
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -52,8 +52,7 @@ class CSwerveModule: public frc::SwerveModuleState
   double    GetAngle();
   double    GetAngleSetpoint();
   void      SetSpeed(double dSpeed);
-  double    GetSpeed();
-  double    GetSpeedSetpoint();
+  double    GetSpeed();  double    GetSpeedSetpoint();
   void      SetModuleReversed(bool bIsReversed);
   void      SetState(int nState);
   int       GetState();

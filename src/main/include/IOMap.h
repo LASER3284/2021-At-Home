@@ -3,7 +3,9 @@
 
     Classes:		None
 
-    Project:		Swerve Drive
+    Project:		2021 Infinite Recharge At-Home Robot Code.
+
+    Copyright © 2021 FIRST Team 3284 - Camdenton LASER Robotics.
 ****************************************************************************/
 #pragma once
 /////////////////////////////////////////////////////////////////////////////
@@ -18,7 +20,7 @@ const int nAzimuthMotorLeftFront  		=  	2;		//  Falcon 500 ID for left front azi
 const int nDriveMotorRightFront			=   3;		//  Falcon 500 ID for right front drive motor
 const int nAzimuthMotorRightFront  		=   4;		//  Falcon 500 ID for right front azimuth motor						
 const int nDriveMotorLeftBack	  		=  	5;		//  Falcon 500 ID for left back drive motor
-const int nAzimuthMotorLeftBack	  		=  	6;		//  Falcon 500 ID for left back azimuth motor					
+const int nAzimuthMotorLeftBack	  		=   6;		//  Falcon 500 ID for left back azimuth motor					
 const int nDriveMotorRightBack	  		=   7;		//  Falcon 500 ID for right back drive motor
 const int nAzimuthMotorRightBack		=   8;		//  Falcon 500 ID for right back azimuth motor
 const int nEncoderFrontLeft             =   9;      //  CANCoder ID for front left encoder
@@ -27,6 +29,14 @@ const int nEncoderBackLeft              =  11;      //  CANCoder ID for back lef
 const int nEncoderBackRight             =  12;      //  CANCoder ID for back right encoder
 const int nShooterLeft                  =  13;      //  Spark MAX ID for left shooter motor
 const int nShooterRight                 =  14;	    //  Spark MAX ID for right shooter motor
+const int nHoodMotor                    =  15;      //  Spark MAX ID for hood motor.
+const int nIntakeMotor                  =  16;      //  Spark MAX ID for intake motor.
+const int nPreloadMotor                 =  17;      //  Falcon 500 ID for the preload motor.
+const int nTurretMotor                  =  18;      //  Spark MAX ID for turret motor.
+
+// Solenoid Channels.
+const int nIntakeSolenoid               =   0;      // Solenoid channel for the intake.
+const int nLiftSolenoid                 =   1;      // Solenoid chennel for the lift.
 
 // Digital Channels
 const int nVisionLEDChannel             =   0;      //  Digital channel ID for LED control line

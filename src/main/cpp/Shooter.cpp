@@ -1,8 +1,11 @@
 /****************************************************************************
     Description:	Implements the CShooter control class.
+
     Classes:		CShooter
-    Project:		2020 Infinite Recharge Robot Code.
-    Copyright 2020 First Team 3284 - Camdenton LASER Robotics.
+
+    Project:		2021 Infinite Recharge At-Home Robot Code.
+
+    Copyright © 2021 FIRST Team 3284 - Camdenton LASER Robotics.
 ****************************************************************************/
 #include "Shooter.h"
 
@@ -80,7 +83,7 @@ void CShooter::Init()
     m_pLeftShooter->SetInverted(false);
     m_pRightShooter->SetInverted(true);
     // Set the peak (maximum) motor output for both controllers.
-    m_pLeftShooter->GetPIDController().SetOutputRange(-1.0, 1.0);
+    m_pLeftShooter->GetPIDController().SetOutputRange(0.0, 1.0);
     // Set the tolerances.
     SetTolerance(m_dTolerance);
     // Set the PID and feed forward values.
@@ -202,7 +205,6 @@ void CShooter::SetSetpoint(double dSetpoint)
 
     // Set the member variable.
     m_dSetpoint = dSetpoint;
-
     // Give the PID controller a setpoint.
     if (m_bMotionMagic)
     {
